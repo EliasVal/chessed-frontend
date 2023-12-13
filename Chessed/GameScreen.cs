@@ -82,7 +82,7 @@ namespace Chessed
         private void HandleMove(Move move)
         {
             gameState.MakeMove(move);
-            //DrawBoard(gameState.Board);
+            DrawBoard(gameState.Board);
             //SetCursor(gameState.CurrentPlayer);
 
             //if (gameState.IsGameOver())
@@ -108,7 +108,7 @@ namespace Chessed
             foreach (Position to in moveCache.Keys)
             {
 
-                ((ImageButton)((FrameLayout)chessBoard.GetChildAt(to.Row * 8 + to.Column)).GetChildAt(0)).SetBackgroundColor(Resources.GetColor(Resource.Color.selectedYellow, Theme));
+                ((ImageButton)((FrameLayout)chessBoard.GetChildAt(to.Row * 8 + to.Column)).GetChildAt(0)).SetBackgroundColor(Resources.GetColor(Resource.Color.board_select, Theme));
                 //highlights[to.Row, to.Column].Fill = new SolidColorBrush(color);
             }
         }
@@ -117,7 +117,7 @@ namespace Chessed
         {
             foreach (Position to in moveCache.Keys)
             {
-                ((ImageButton)((FrameLayout)chessBoard.GetChildAt(to.Row * 8 + to.Column)).GetChildAt(0)).SetBackgroundColor(Resources.GetColor((to.Row * 8 + to.Column % 2 == 1) ? Resource.Color.red : Resource.Color.white, Theme));
+                ((ImageButton)((FrameLayout)chessBoard.GetChildAt(to.Row * 8 + to.Column)).GetChildAt(0)).SetBackgroundColor(Resources.GetColor(((to.Row + to.Column) % 2 == 1) ? Resource.Color.board_dark : Resource.Color.board_light, Theme));
                 //highlights[to.Row, to.Column].Fill = new SolidColorBrush(color);
             }
         }
@@ -170,7 +170,8 @@ namespace Chessed
                 {
                     FrameLayout container = new FrameLayout(this)
                     {
-                        LayoutParameters = new LinearLayout.LayoutParams(width / 8, width / 8)
+                        LayoutParameters = new LinearLayout.LayoutParams(width / 8, width / 8),
+                        Background = Resources.GetDrawable(Resource.Drawable.border, Theme)
                     };
 
                     ImageButton buttonView = new ImageButton(this)
@@ -185,7 +186,7 @@ namespace Chessed
                         Gravity = GravityFlags.Left | GravityFlags.Bottom,
                     };
 
-                    buttonView.SetBackgroundColor(Resources.GetColor((j + i) % 2 == 1 ? Resource.Color.red : Resource.Color.white, Theme));
+                    buttonView.SetBackgroundColor(Resources.GetColor((j + i) % 2 == 1 ? Resource.Color.board_dark : Resource.Color.board_light, Theme));
 
                     if (j != 0 && i == 7)
                     {
@@ -228,6 +229,7 @@ namespace Chessed
                     //pieceImages[r, c].Source = Images.GetImage(piece);
 
                     if (PieceImages.GetImage(piece) != 0) ib.SetImageDrawable(Resources.GetDrawable(PieceImages.GetImage(piece), Theme));
+                    else ib.SetImageDrawable(null);
                 }
             }
         }
