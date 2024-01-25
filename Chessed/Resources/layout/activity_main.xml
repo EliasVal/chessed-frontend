@@ -7,44 +7,65 @@
     android:layout_height="match_parent"
     android:accessibilityHeading="false"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
+    android:gravity="center"
     >
-
-    <!--<com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />-->
-    <EditText
-        android:inputType="textPassword"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/passwordEt"
-        android:hint="Pass" 
-        />
-    <EditText
-        android:hint="E-Mail"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:minWidth="25px"
-        android:minHeight="25px"
-        android:inputType="textEmailAddress"
-        android:id="@+id/emailEt" />
-    <EditText
-        android:hint="Username"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:minWidth="25px"
-        android:minHeight="25px"
-        android:id="@+id/usernameEt"
-        android:inputType="text"
-         />
-    <Button
-        android:text="Sign up"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/signUpBtn" />
-
+        android:text="Chessed"
+        android:gravity="center"
+        android:textSize="35dp"
+        android:layout_marginBottom="150px"
+    />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+        <EditText
+            android:hint="Username"
+            android:id="@+id/usernameEt"
+            android:inputType="text"
+            style="@style/inputField"
+            android:visibility="invisible"
+        />
+        <EditText
+            android:hint="E-Mail"
+            android:inputType="textEmailAddress"
+            style="@style/inputField"
+            android:id="@+id/emailEt"
+        />
+        <EditText
+            android:inputType="textPassword"
+            android:id="@+id/passwordEt"
+            android:hint="Password"
+            style="@style/inputField"
+            android:password="true"
+        />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="200px"
+        >
+        <Button
+            android:text="Sign in"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/actionBtn"
+            android:layout_marginTop="50px"
+            app:backgroundTint="@color/green"
+            android:paddingHorizontal="25dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Not a user? Sign up"
+            android:gravity="center"
+            android:id="@+id/actionSwitch"
+            android:clickable="true"
+            android:onClick="ActionSwitch"
+        />
+    </LinearLayout>
 </LinearLayout>

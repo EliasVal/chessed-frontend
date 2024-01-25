@@ -10,7 +10,10 @@ using Java.Security.Cert;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
+using System.Threading.Tasks;
+using static Android.Gms.Common.Apis.Api;
 using static Android.Provider.MediaStore;
 
 namespace Chessed
@@ -26,6 +29,10 @@ namespace Chessed
         //Board board;
 
         private readonly Dictionary<Position, Move> moveCache = new Dictionary<Position, Move>();
+
+        ClientWebSocket client = Client.Instance.client;
+
+        const Player player = Player.White;
 
 
         //Piece.PieceColor playingAs = Piece.PieceColor.White;
@@ -47,9 +54,42 @@ namespace Chessed
 
             //board.cellGrid[1, 1].occupied = true;
             //ShowLegalMoves();
+            Task.Run(async () => await ReadMessage());
         }
 
-        private void OnFromPositionSelected(Position pos)
+        async Task ReadMessage()
+        {
+            while (client.State == WebSocketState.Open)
+            {
+
+                WebSocketReceiveResult result;
+                var message = new ArraySegment<byte>(new byte[4096]);
+                do
+                {
+                    result = await client.ReceiveAsync(message, default);
+                    if (result.MessageType != WebSocketMessageType.Text)
+                        break;
+                    var messageBytes = message.Skip(message.Offset).Take(result.Count).ToArray();
+                    string receivedMessage = Encoding.UTF8.GetString(messageBytes);
+                    RunOnUiThread(() => {
+                        Toast.MakeText(this, receivedMessage, ToastLength.Short).Show();
+
+                        string[] move = receivedMessage.Split('-');
+                        int[] sqStart = Board.PositionFromStr(move[0]);
+                        Position posStart = new Position(sqStart[0], sqStart[1]);
+
+                        int[] sqEnd = Board.PositionFromStr(move[1]);
+                        Position posEnd = new Position(sqEnd[0], sqEnd[1]);
+
+                        OnFromPositionSelected(posStart, false);
+                        OnToPositionSelected(posEnd);
+                    });
+                }
+                while (!result.EndOfMessage);
+            }
+        }
+
+        private void OnFromPositionSelected(Position pos, bool highlight = true)
         {
             IEnumerable<Move> moves = gameState.LegalMovesForPiece(pos);
 
@@ -57,7 +97,7 @@ namespace Chessed
             {
                 selectedPos = pos;
                 CacheMoves(moves);
-                ShowHighlights();
+                if (highlight) ShowHighlights();
             }
         }
 
@@ -68,6 +108,16 @@ namespace Chessed
 
             if (moveCache.TryGetValue(pos, out Move move))
             {
+                if (gameState.CurrentPlayer == player)
+                {
+                    Task.Run(async () => {
+                        var byteMessage = Encoding.UTF8.GetBytes($"{move.FromPos}-{move.ToPos}");
+                        var segmnet = new ArraySegment<byte>(byteMessage);
+
+                        await client.SendAsync(segmnet, WebSocketMessageType.Text, true, default);
+                    });
+                }
+
                 if (move.Type == MoveType.PawnPromotion)
                 {
                     //HandlePromotion(move.FromPos, move.ToPos);
@@ -124,8 +174,11 @@ namespace Chessed
 
         public void OnClick(View v)
         {
+            if (gameState.CurrentPlayer != player) return;
             int[] sq = Board.PositionFromStr(v.TransitionName);
             Position pos = new Position(sq[0], sq[1]);
+
+            
 
             if (selectedPos == null)
             {

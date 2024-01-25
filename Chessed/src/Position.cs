@@ -50,5 +50,10 @@ namespace Chessed
         {
             return new Position(pos.Row + dir.RowDelta, pos.Column + dir.ColumnDelta);
         }
+
+        public override string ToString()
+        {
+            return $"{Row}{Column}";
+        }
     }
 }
