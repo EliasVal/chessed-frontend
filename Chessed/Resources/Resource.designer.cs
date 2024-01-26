@@ -4764,7 +4764,25 @@ namespace Chessed
 		{
 			
 			// aapt resource value: 0x7F0E0000
-			public const int firebase_common_keep = 2131623936;
+			public const int capture = 2131623936;
+			
+			// aapt resource value: 0x7F0E0001
+			public const int castle = 2131623937;
+			
+			// aapt resource value: 0x7F0E0002
+			public const int check = 2131623938;
+			
+			// aapt resource value: 0x7F0E0003
+			public const int firebase_common_keep = 2131623939;
+			
+			// aapt resource value: 0x7F0E0004
+			public const int illegal = 2131623940;
+			
+			// aapt resource value: 0x7F0E0005
+			public const int move = 2131623941;
+			
+			// aapt resource value: 0x7F0E0006
+			public const int promote = 2131623942;
 			
 			static Raw()
 			{
@@ -4960,67 +4978,46 @@ namespace Chessed
 			public const int copy_toast_msg = 2131689531;
 			
 			// aapt resource value: 0x7F0F003C
-			public const int default_web_client_id = 2131689532;
+			public const int fab_transformation_scrim_behavior = 2131689532;
 			
 			// aapt resource value: 0x7F0F003D
-			public const int fab_transformation_scrim_behavior = 2131689533;
+			public const int fab_transformation_sheet_behavior = 2131689533;
 			
 			// aapt resource value: 0x7F0F003E
-			public const int fab_transformation_sheet_behavior = 2131689534;
+			public const int fallback_menu_item_copy_link = 2131689534;
 			
 			// aapt resource value: 0x7F0F003F
-			public const int fallback_menu_item_copy_link = 2131689535;
+			public const int fallback_menu_item_open_in_browser = 2131689535;
 			
 			// aapt resource value: 0x7F0F0040
-			public const int fallback_menu_item_open_in_browser = 2131689536;
+			public const int fallback_menu_item_share_link = 2131689536;
 			
 			// aapt resource value: 0x7F0F0041
-			public const int fallback_menu_item_share_link = 2131689537;
+			public const int hide_bottom_view_on_scroll_behavior = 2131689537;
 			
 			// aapt resource value: 0x7F0F0042
-			public const int gcm_defaultSenderId = 2131689538;
+			public const int mtrl_chip_close_icon_content_description = 2131689538;
 			
 			// aapt resource value: 0x7F0F0043
-			public const int google_api_key = 2131689539;
+			public const int password_toggle_content_description = 2131689539;
 			
 			// aapt resource value: 0x7F0F0044
-			public const int google_app_id = 2131689540;
+			public const int path_password_eye = 2131689540;
 			
 			// aapt resource value: 0x7F0F0045
-			public const int google_crash_reporting_api_key = 2131689541;
+			public const int path_password_eye_mask_strike_through = 2131689541;
 			
 			// aapt resource value: 0x7F0F0046
-			public const int google_storage_bucket = 2131689542;
+			public const int path_password_eye_mask_visible = 2131689542;
 			
 			// aapt resource value: 0x7F0F0047
-			public const int hide_bottom_view_on_scroll_behavior = 2131689543;
+			public const int path_password_strike_through = 2131689543;
 			
 			// aapt resource value: 0x7F0F0048
-			public const int mtrl_chip_close_icon_content_description = 2131689544;
+			public const int search_menu_title = 2131689544;
 			
 			// aapt resource value: 0x7F0F0049
-			public const int password_toggle_content_description = 2131689545;
-			
-			// aapt resource value: 0x7F0F004A
-			public const int path_password_eye = 2131689546;
-			
-			// aapt resource value: 0x7F0F004B
-			public const int path_password_eye_mask_strike_through = 2131689547;
-			
-			// aapt resource value: 0x7F0F004C
-			public const int path_password_eye_mask_visible = 2131689548;
-			
-			// aapt resource value: 0x7F0F004D
-			public const int path_password_strike_through = 2131689549;
-			
-			// aapt resource value: 0x7F0F004E
-			public const int project_id = 2131689550;
-			
-			// aapt resource value: 0x7F0F004F
-			public const int search_menu_title = 2131689551;
-			
-			// aapt resource value: 0x7F0F0050
-			public const int status_bar_notification_info_overflow = 2131689552;
+			public const int status_bar_notification_info_overflow = 2131689545;
 			
 			static String()
 			{

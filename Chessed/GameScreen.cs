@@ -1,11 +1,14 @@
 ﻿using Android.App;
 using Android.Bluetooth;
 using Android.Content;
+using Android.Media;
 using Android.OS;
 using Android.Runtime;
 using Android.Service.Autofill;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
+using Chessed.src;
 using Java.Security.Cert;
 using System;
 using System.Collections.Generic;
@@ -13,18 +16,17 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
-using static Android.Gms.Common.Apis.Api;
-using static Android.Provider.MediaStore;
 
 namespace Chessed
 {
     [Activity(Label = "GameScreen")]
     public class GameScreen : Activity, View.IOnClickListener
     {
-        readonly string abc = "ABCDEFGH";
+        readonly string abc = "abcdefgh";
         GridLayout chessBoard;
         private GameState gameState;
         private Position selectedPos = null;
+
 
         //Board board;
 
@@ -32,7 +34,7 @@ namespace Chessed
 
         ClientWebSocket client = Client.Instance.client;
 
-        const Player player = Player.White;
+        const Player player = Player.Black;
 
 
         //Piece.PieceColor playingAs = Piece.PieceColor.White;
@@ -70,7 +72,7 @@ namespace Chessed
                     if (result.MessageType != WebSocketMessageType.Text)
                         break;
                     var messageBytes = message.Skip(message.Offset).Take(result.Count).ToArray();
-                    string receivedMessage = Encoding.UTF8.GetString(messageBytes);
+                    string receivedMessage = System.Text.Encoding.UTF8.GetString(messageBytes);
                     RunOnUiThread(() => {
                         Toast.MakeText(this, receivedMessage, ToastLength.Short).Show();
 
@@ -111,12 +113,16 @@ namespace Chessed
                 if (gameState.CurrentPlayer == player)
                 {
                     Task.Run(async () => {
-                        var byteMessage = Encoding.UTF8.GetBytes($"{move.FromPos}-{move.ToPos}");
+                        var byteMessage = System.Text.Encoding.UTF8.GetBytes($"{move.FromPos}-{move.ToPos}");
                         var segmnet = new ArraySegment<byte>(byteMessage);
 
                         await client.SendAsync(segmnet, WebSocketMessageType.Text, true, default);
                     });
                 }
+
+                FrameLayout square = (FrameLayout)chessBoard.GetChildAt(move.ToPos.Row * 8 + move.ToPos.Column);
+                ImageButton piece = (ImageButton)square.GetChildAt(0);
+                bool isEmptySquare = piece.Drawable == null;
 
                 if (move.Type == MoveType.PawnPromotion)
                 {
@@ -125,6 +131,25 @@ namespace Chessed
                 else
                 {
                     HandleMove(move);
+                }
+
+                
+
+                if (gameState.Board.IsInCheck(gameState.CurrentPlayer))
+                {
+                    Sounds.PlaySound(this, "check");
+                }
+                else if (move.Type == MoveType.CastleQS || move.Type == MoveType.CastleKS)
+                {
+                    Sounds.PlaySound(this, "castle");
+                }
+                else if (isEmptySquare)
+                {
+                    Sounds.PlaySound(this, "move");
+                }
+                else
+                {
+                    Sounds.PlaySound(this, "capture");
                 }
             }
         }
@@ -174,7 +199,7 @@ namespace Chessed
 
         public void OnClick(View v)
         {
-            if (gameState.CurrentPlayer != player) return;
+            //if (gameState.CurrentPlayer != player) return;
             int[] sq = Board.PositionFromStr(v.TransitionName);
             Position pos = new Position(sq[0], sq[1]);
 
@@ -232,8 +257,10 @@ namespace Chessed
                         LayoutParameters = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent),
                     };
                     buttonView.SetScaleType(ImageView.ScaleType.FitCenter);
+                    //buttonView.SetAdjustViewBounds(true);
+                    buttonView.SetPadding(0, 0, 0, 0);
 
-                    TextView squareTv = new TextView(this)
+                    TextView coordTv = new TextView(this)
                     {
                         LayoutParameters = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent),
                         Gravity = GravityFlags.Left | GravityFlags.Bottom,
@@ -241,29 +268,49 @@ namespace Chessed
 
                     buttonView.SetBackgroundColor(Resources.GetColor((j + i) % 2 == 1 ? Resource.Color.board_dark : Resource.Color.board_light, Theme));
 
-                    if (j != 0 && i == 7)
+                    if (player == Player.White)
                     {
-                        squareTv.Text = abc[j].ToString();
-
-                    }
-
-                    if (j == 0)
-                    {
-                        squareTv.Text = (8 - i).ToString();
-                        if (i == 7)
+                        if (j != 0 && i == 7)
                         {
-                            squareTv.Text += "A";
+                            coordTv.Text = abc[j].ToString();
+                        }
+
+                        if (j == 0)
+                        {
+                            coordTv.Text = (8 - i).ToString();
+                            if (i == 7)
+                            {
+                                coordTv.Text += "a";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (j != 7 && i == 0)
+                        {
+                            coordTv.Text = abc[j].ToString();
+                        }
+
+                        if (j == 7)
+                        {
+                            coordTv.Text = (8 - i).ToString();
+                            if (i == 0)
+                            {
+                                coordTv.Text += "h";
+                            }
                         }
                     }
 
-                    squareTv.SetPadding(10, 10, 10, 10);
+                    coordTv.SetPadding(10, 10, 10, 10);
 
                     buttonView.TransitionName = $"{i}{j}";
 
                     buttonView.SetOnClickListener(this);
 
                     container.AddView(buttonView);
-                    container.AddView(squareTv);
+                    container.AddView(coordTv);
+
+                    if (player == Player.Black) container.Rotation = 180;
 
                     chessBoard.AddView(container);
                 }
@@ -285,55 +332,10 @@ namespace Chessed
                     else ib.SetImageDrawable(null);
                 }
             }
-        }
-        void FillBoard()
-        {
-            for (int i = 0; i < 8; i++)
+
+            if (player == Player.Black)
             {
-                for (int j = 0; j < 8; j++)
-                {
-                    ImageButton ib = (ImageButton)((FrameLayout)chessBoard.GetChildAt(8 * i + j)).GetChildAt(0);
-
-                    int drawable = 0;
-                    // PAWNS
-                    if (i == 6)
-                    {
-                        drawable = Resource.Drawable.pw;
-                    }
-                    else if (i == 1) {
-
-                        drawable = Resource.Drawable.pb;
-                    }
-                    else if (j == 0 || j == 7)
-                    {
-                        if (i == 0) drawable = Resource.Drawable.rb;
-                        else if (i == 7) drawable = Resource.Drawable.rw;
-                    }
-                    else if (j == 1 || j == 6)
-                    {
-                        if (i == 0) drawable = Resource.Drawable.nb;
-                        else if (i == 7) drawable = Resource.Drawable.nw;
-                    }
-                    else if (j == 2 || j == 5)
-                    {
-                        if (i == 0) drawable = Resource.Drawable.bb;
-                        else if (i == 7) drawable = Resource.Drawable.bw;
-                    }
-                    else if (j == 3)
-                    {
-                        if (i == 0) drawable = Resource.Drawable.bq;
-                        else if (i == 7) drawable = Resource.Drawable.wq;
-                    }
-                    else if (j == 4)
-                    {
-                        if (i == 0) drawable = Resource.Drawable.kb;
-                        else if (i == 7) drawable = Resource.Drawable.kw;
-                    }
-
-                    if (drawable != 0) ib.SetImageDrawable(GetDrawable(drawable));
-
-
-                }
+                chessBoard.Rotation = 180;
             }
         }
     }
