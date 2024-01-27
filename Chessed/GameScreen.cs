@@ -16,11 +16,12 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
+using static Android.Provider.MediaStore;
 
 namespace Chessed
 {
     [Activity(Label = "GameScreen")]
-    public class GameScreen : Activity, View.IOnClickListener
+    public class GameScreen : Activity//, View.IOnClickListener
     {
         readonly string abc = "abcdefgh";
         GridLayout chessBoard;
@@ -120,13 +121,9 @@ namespace Chessed
                     });
                 }
 
-                FrameLayout square = (FrameLayout)chessBoard.GetChildAt(move.ToPos.Row * 8 + move.ToPos.Column);
-                ImageButton piece = (ImageButton)square.GetChildAt(0);
-                bool isEmptySquare = piece.Drawable == null;
-
                 if (move.Type == MoveType.PawnPromotion)
                 {
-                    //HandlePromotion(move.FromPos, move.ToPos);
+                    HandlePromotion(move.FromPos, move.ToPos);
                 }
                 else
                 {
@@ -135,35 +132,75 @@ namespace Chessed
 
                 
 
-                if (gameState.Board.IsInCheck(gameState.CurrentPlayer))
+                
+            }
+        }
+
+        private void HandlePromotion(Position from, Position to)
+        {
+            View promotionScreen = FindViewById(Resource.Id.promotionScreen);
+            promotionScreen.Visibility = ViewStates.Visible;
+
+            LinearLayout pieceLayout = FindViewById<LinearLayout>(Resource.Id.pieces);
+
+            PieceType[] pieceTypes = new PieceType[] { PieceType.Queen, PieceType.Rook, PieceType.Bishop, PieceType.Knight };
+            for (int i = 0; i < pieceTypes.Length; i++)
+            {
+                ImageButton btn = (ImageButton)pieceLayout.GetChildAt(i);
+                btn.SetImageDrawable(Resources.GetDrawable(PieceImages.GetImage(player, pieceTypes[i]), Theme));
+
+                // Creating this temp variable because I still updates after setting the delegate
+                int temp = i;
+                EventHandler click = null;
+                click = (sender, e) =>
                 {
-                    Sounds.PlaySound(this, "check");
-                }
-                else if (move.Type == MoveType.CastleQS || move.Type == MoveType.CastleKS)
-                {
-                    Sounds.PlaySound(this, "castle");
-                }
-                else if (isEmptySquare)
-                {
-                    Sounds.PlaySound(this, "move");
-                }
-                else
-                {
-                    Sounds.PlaySound(this, "capture");
-                }
+                    Move promotionMove = new PawnPromotion(from, to, pieceTypes[temp]);
+                    HandleMove(promotionMove);
+                    promotionScreen.Visibility = ViewStates.Gone;
+
+                    // Unsubscribe from self
+                    btn.Click -= click;
+                };
+
+                btn.Click += click;
             }
         }
 
         private void HandleMove(Move move)
         {
+            FrameLayout square = (FrameLayout)chessBoard.GetChildAt(move.ToPos.Row * 8 + move.ToPos.Column);
+            ImageButton piece = (ImageButton)square.GetChildAt(0);
+            bool isEmptySquare = piece.Drawable == null;
+
             gameState.MakeMove(move);
             DrawBoard(gameState.Board);
+
+            if (gameState.Board.IsInCheck(gameState.CurrentPlayer))
+            {
+                Sounds.PlaySound(this, "check");
+            }
+            else if (move.Type == MoveType.PawnPromotion)
+            {
+                Sounds.PlaySound(this, "promote");
+            }
+            else if (move.Type == MoveType.CastleQS || move.Type == MoveType.CastleKS)
+            {
+                Sounds.PlaySound(this, "castle");
+            }
+            else if (isEmptySquare)
+            {
+                Sounds.PlaySound(this, "move");
+            }
+            else
+            {
+                Sounds.PlaySound(this, "capture");
+            }
             //SetCursor(gameState.CurrentPlayer);
 
-            //if (gameState.IsGameOver())
-            //{
-            //    ShowGameOver();
-            //}
+            if (gameState.IsGameOver())
+            {
+                Toast.MakeText(this, "GAME JOEVER", ToastLength.Short).Show();
+            }
         }
 
         private void CacheMoves(IEnumerable<Move> moves)
@@ -178,11 +215,8 @@ namespace Chessed
 
         private void ShowHighlights()
         {
-            
-
             foreach (Position to in moveCache.Keys)
             {
-
                 ((ImageButton)((FrameLayout)chessBoard.GetChildAt(to.Row * 8 + to.Column)).GetChildAt(0)).SetBackgroundColor(Resources.GetColor(Resource.Color.board_select, Theme));
                 //highlights[to.Row, to.Column].Fill = new SolidColorBrush(color);
             }
@@ -197,29 +231,19 @@ namespace Chessed
             }
         }
 
-        public void OnClick(View v)
-        {
-            //if (gameState.CurrentPlayer != player) return;
-            int[] sq = Board.PositionFromStr(v.TransitionName);
-            Position pos = new Position(sq[0], sq[1]);
+        //public void OnClick(View v)
+        //{
+        //    Log.Debug("SCREEN", "PRESSED OUTER");
 
+        //    //if (gameState.CurrentPlayer != player) return;
             
+        //    // TODO: Check if chess piece 
+        //    //if (board.turnOf != playingAs)
+        //    //{
+        //    //    return;
+        //    //}
 
-            if (selectedPos == null)
-            {
-                OnFromPositionSelected(pos);
-            }
-            else
-            {
-                OnToPositionSelected(pos);
-            }
-            // TODO: Check if chess piece 
-            //if (board.turnOf != playingAs)
-            //{
-            //    return;
-            //}
-
-        }
+        //}
 
         //public void ShowLegalMoves()
         //{
@@ -259,6 +283,7 @@ namespace Chessed
                     buttonView.SetScaleType(ImageView.ScaleType.FitCenter);
                     //buttonView.SetAdjustViewBounds(true);
                     buttonView.SetPadding(0, 0, 0, 0);
+                    buttonView.Click += SquareClick;
 
                     TextView coordTv = new TextView(this)
                     {
@@ -305,7 +330,7 @@ namespace Chessed
 
                     buttonView.TransitionName = $"{i}{j}";
 
-                    buttonView.SetOnClickListener(this);
+                    //buttonView.SetOnClickListener(this);
 
                     container.AddView(buttonView);
                     container.AddView(coordTv);
@@ -314,6 +339,21 @@ namespace Chessed
 
                     chessBoard.AddView(container);
                 }
+            }
+        }
+
+        private void SquareClick(object sender, EventArgs e)
+        {
+            int[] sq = Board.PositionFromStr(((View)sender).TransitionName);
+            Position pos = new Position(sq[0], sq[1]);
+
+            if (selectedPos == null)
+            {
+                OnFromPositionSelected(pos);
+            }
+            else
+            {
+                OnToPositionSelected(pos);
             }
         }
 

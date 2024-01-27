@@ -12,28 +12,33 @@
         android:gravity="center_vertical"
         android:padding="10dp"
         android:layout_above="@id/chessBoard"
+        android:id="@+id/linearLayout2"
     >
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/person"
             android:contentDescription=""
+            android:id="@+id/imageView2" 
         />
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginLeft="5dp">
+            android:layout_marginLeft="5dp"
+            android:id="@+id/linearLayout2">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="John Doe"
+                android:id="@+id/textView3" 
             />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2000 ELO"
                 android:textColor="#7FFFFFFF"
+                android:id="@+id/textView4" 
                 />
         </LinearLayout>
     </LinearLayout>
@@ -91,7 +96,7 @@
             android:layout_height="70dp"
             android:src="@drawable/flagIcon"
             android:contentDescription=""
-            android:scaleType="fitCenter" 
+            android:scaleType="fitCenter"
             android:backgroundTint="@android:color/transparent"
         />
         <Space
@@ -104,7 +109,7 @@
             android:layout_height="70dp"
             android:src="@drawable/handShakeIcon"
             android:contentDescription=""
-            android:scaleType="fitCenter" 
+            android:scaleType="fitCenter"
             android:backgroundTint="@android:color/transparent"
         />
         <Space
@@ -117,5 +122,53 @@
             android:src="@drawable/rb"
             />
     </LinearLayout>
+    <RelativeLayout
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:id="@+id/promotionScreen"
+        android:visibility="invisible"
+        android:background="#AA2b2b2b">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true"
+            android:background="@drawable/roundedcorner"
+            android:padding="20dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select a piece for promotion"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="10dp"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/pieces">
+                <ImageButton
+                    android:src="@drawable/bq"
+                    style="@style/promotionButton"
+                    android:contentDescription="Queen" />
+                <ImageButton
+                    style="@style/promotionButton"
+                    android:src="@drawable/rb"
+                    android:contentDescription="Rook" />
+                <ImageButton
+                    style="@style/promotionButton"
+                    android:src="@drawable/bb"
+                    android:contentDescription="Bishop" />
+                <ImageButton
+                    style="@style/promotionButton"
+                    android:src="@drawable/nb"
+                    android:contentDescription="Knight" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
     
+    <!--<Chessed.PromotionMenu android:layout_width="match_parent"
+        android:layout_height="match_parent"/>-->
 </RelativeLayout>

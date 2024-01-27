@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:minWidth="25px"
+    android:minHeight="25px"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerInParent="true"
+    android:id="@+id/promotionScreen"
+    android:background="#AA2b2b2b">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        android:background="@drawable/roundedcorner"
+        android:padding="20dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select a piece for promotion"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ImageButton
+                android:src="@drawable/bq"
+                style="@style/promotionButton"
+                android:contentDescription="Queen" />
+            <ImageButton
+                style="@style/promotionButton"
+                android:src="@drawable/rb"
+                android:contentDescription="Rook" />
+            <ImageButton
+                style="@style/promotionButton"
+                android:src="@drawable/bb"
+                android:contentDescription="Bishop" />
+            <ImageButton
+                style="@style/promotionButton"
+                android:src="@drawable/nb"
+                android:contentDescription="Knight" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
