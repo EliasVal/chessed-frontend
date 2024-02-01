@@ -21,7 +21,6 @@ using System.Text.Json;
 using Xamarin.Essentials;
 using Java.Util;
 using System.Collections.Generic;
-//using Newtonsoft.Json;
 
 namespace Chessed
 {
@@ -56,16 +55,9 @@ namespace Chessed
             //});
             
             base.OnCreate(savedInstanceState);
-            //Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            //SetContentView(Resource.Layout.activity_main);
 
+            Preferences.Clear();
 
-            //Preferences.Clear();
-            //FirebaseApp.InitializeApp(this);
-            //mInstance = FirebaseApp.GetInstance("[DEFAULT]");
-            //mAuth = FirebaseAuth.GetInstance(mInstance);
-
-            //signUp.Click += SignUp_Click;
             bool validToken = true;
             if (Preferences.Get("token", "") == "") validToken = false;
 

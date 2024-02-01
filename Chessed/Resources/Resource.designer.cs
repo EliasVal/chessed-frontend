@@ -4797,16 +4797,13 @@ namespace Chessed
 			public const int check = 2131623938;
 			
 			// aapt resource value: 0x7F0E0003
-			public const int firebase_common_keep = 2131623939;
+			public const int illegal = 2131623939;
 			
 			// aapt resource value: 0x7F0E0004
-			public const int illegal = 2131623940;
+			public const int move = 2131623940;
 			
 			// aapt resource value: 0x7F0E0005
-			public const int move = 2131623941;
-			
-			// aapt resource value: 0x7F0E0006
-			public const int promote = 2131623942;
+			public const int promote = 2131623941;
 			
 			static Raw()
 			{

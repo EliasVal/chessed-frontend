@@ -187,7 +187,7 @@ namespace Chessed
             {
                 Sounds.PlaySound(this, "castle");
             }
-            else if (isEmptySquare)
+            else if (isEmptySquare && move.Type != MoveType.EnPassant)
             {
                 Sounds.PlaySound(this, "move");
             }
@@ -199,7 +199,7 @@ namespace Chessed
 
             if (gameState.IsGameOver())
             {
-                Toast.MakeText(this, "GAME JOEVER", ToastLength.Short).Show();
+                Toast.MakeText(this, "GAME OVER", ToastLength.Short).Show();
             }
         }
 
