@@ -16,6 +16,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using static Android.Provider.MediaStore;
@@ -37,7 +38,7 @@ namespace Chessed
 
         ClientWebSocket client = Client.Instance.client;
 
-        const Player player = Player.Black;
+        Player player = Player.White;
 
         Dictionary<string, string> matchData;
 
@@ -60,8 +61,7 @@ namespace Chessed
 
             matchData = JsonSerializer.Deserialize<Dictionary<string, string>>(Intent.GetStringExtra("data"));
 
-            BuildBoard();
-            DrawBoard(gameState.Board);
+            
 
             // Set the details of each player
             opponentName = FindViewById<TextView>(Resource.Id.opponentName);
@@ -76,6 +76,10 @@ namespace Chessed
             playerName.Text = Preferences.Get("username", "");
             playerElo.Text = Preferences.Get("elo", "") + " ELO";
 
+            player = matchData["color"] == "white" ? Player.White : Player.Black;
+
+            BuildBoard();
+            DrawBoard(gameState.Board);
 
             Task.Run(async () => await ReadMessage());
         }
@@ -89,24 +93,53 @@ namespace Chessed
                 var message = new ArraySegment<byte>(new byte[4096]);
                 do
                 {
-                    result = await client.ReceiveAsync(message, default);
+                    result = await client.ReceiveAsync(message, CancellationToken.None);
                     if (result.MessageType != WebSocketMessageType.Text)
                         break;
                     var messageBytes = message.Skip(message.Offset).Take(result.Count).ToArray();
-                    string receivedMessage = System.Text.Encoding.UTF8.GetString(messageBytes);
-                    RunOnUiThread(() => {
-                        Toast.MakeText(this, receivedMessage, ToastLength.Short).Show();
+                    string resStr = System.Text.Encoding.UTF8.GetString(messageBytes);
+                    Dictionary<string, string> receivedMessage = JsonSerializer.Deserialize<Dictionary<string, string>>(resStr);
 
-                        string[] move = receivedMessage.Split('-');
-                        int[] sqStart = Board.PositionFromStr(move[0]);
-                        Position posStart = new Position(sqStart[0], sqStart[1]);
+                    if (receivedMessage["type"] == "move" || receivedMessage["type"] == "game_over")
+                    {
+                        string strMove = receivedMessage["data"];
+                        RunOnUiThread(() => {
+                            if (strMove == "null") return;
 
-                        int[] sqEnd = Board.PositionFromStr(move[1]);
-                        Position posEnd = new Position(sqEnd[0], sqEnd[1]);
+                            string[] move = strMove.Split('-');
+                            int[] sqStart = Board.PositionFromStr(move[0]);
+                            Position posStart = new Position(sqStart[0], sqStart[1]);
 
-                        OnFromPositionSelected(posStart, false);
-                        OnToPositionSelected(posEnd);
-                    });
+                            int[] sqEnd = Board.PositionFromStr(move[1]);
+                            Position posEnd = new Position(sqEnd[0], sqEnd[1]);
+
+                            OnFromPositionSelected(posStart, false);
+                            OnToPositionSelected(posEnd);
+                        });
+                    }
+
+                    if (receivedMessage["type"] == "game_over")
+                    {
+                        RunOnUiThread(() =>
+                        {
+                            FindViewById(Resource.Id.gameoverScreen).Visibility = ViewStates.Visible;
+                            TextView reason = FindViewById<TextView>(Resource.Id.gameOverReason);
+
+                            reason.Text = receivedMessage["winner"] switch
+                            {
+                                "white" => "White won by checkmate",
+                                "black" => "Black won by checkmate",
+                                "draw" => "Game drawn",
+                                _ => ""
+                            };
+
+                            TextView elo = FindViewById<TextView>(Resource.Id.newElo);
+                            int eloDiff = int.Parse(receivedMessage["newElo"]) - int.Parse(Preferences.Get("elo", "0"));
+                            elo.Text = $"New ELO: {receivedMessage["newElo"]} ({(eloDiff >= 0 ? "+" : "")}{eloDiff})";
+
+                            Preferences.Set("elo", receivedMessage["newElo"]);
+                        });
+                    }
                 }
                 while (!result.EndOfMessage);
             }
@@ -134,10 +167,11 @@ namespace Chessed
                 if (gameState.CurrentPlayer == player)
                 {
                     Task.Run(async () => {
-                        var byteMessage = System.Text.Encoding.UTF8.GetBytes($"{move.FromPos}-{move.ToPos}");
+                        string json = JsonSerializer.Serialize(new { token = Preferences.Get("token", ""), move = $"{move.FromPos}-{move.ToPos}", gameId = matchData["gameId"] });
+                        var byteMessage = System.Text.Encoding.UTF8.GetBytes(json);
                         var segmnet = new ArraySegment<byte>(byteMessage);
 
-                        await client.SendAsync(segmnet, WebSocketMessageType.Text, true, default);
+                        await client.SendAsync(segmnet, WebSocketMessageType.Text, true, CancellationToken.None);
                     });
                 }
 
@@ -217,10 +251,10 @@ namespace Chessed
             }
             //SetCursor(gameState.CurrentPlayer);
 
-            if (gameState.IsGameOver())
-            {
-                Toast.MakeText(this, "GAME OVER", ToastLength.Short).Show();
-            }
+            //if (gameState.IsGameOver())
+            //{
+            //    Toast.MakeText(this, "GAME OVER", ToastLength.Short).Show();
+            //}
         }
 
         private void CacheMoves(IEnumerable<Move> moves)
@@ -364,6 +398,8 @@ namespace Chessed
 
         private void SquareClick(object sender, EventArgs e)
         {
+            if (gameState.CurrentPlayer != player) return;
+
             int[] sq = Board.PositionFromStr(((View)sender).TransitionName);
             Position pos = new Position(sq[0], sq[1]);
 

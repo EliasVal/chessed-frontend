@@ -11,6 +11,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
@@ -29,7 +30,7 @@ namespace Chessed
             
             RunOnUiThread(() => SetContentView(Resource.Layout.waitingForPlayer));
 
-            await client.ConnectAsync(new Uri($"ws://192.168.1.238:8080?token={Preferences.Get("token", "")}"), default);
+            await client.ConnectAsync(new Uri($"ws://192.168.1.238:8080?token={Preferences.Get("token", "")}"), CancellationToken.None);
 
 #pragma warning disable CS4014
             Task.Run(async () => await ReadMessage());
@@ -50,7 +51,7 @@ namespace Chessed
                 var message = new ArraySegment<byte>(new byte[4096]);
                 do
                 {
-                    result = await client.ReceiveAsync(message, default);
+                    result = await client.ReceiveAsync(message, CancellationToken.None);
                     if (result.MessageType != WebSocketMessageType.Text)
                         break;
                     var messageBytes = message.Skip(message.Offset).Take(result.Count).ToArray();
@@ -64,6 +65,8 @@ namespace Chessed
                             i.PutExtra("data", receivedMessage);
                             StartActivity(i);
                         });
+
+                        return;
                     }
                 }
                 while (!result.EndOfMessage);

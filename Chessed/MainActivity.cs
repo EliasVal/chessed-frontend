@@ -56,7 +56,7 @@ namespace Chessed
             
             base.OnCreate(savedInstanceState);
 
-            Preferences.Clear();
+            //Preferences.Clear();
 
             bool validToken = true;
             if (Preferences.Get("token", "") == "") validToken = false;
