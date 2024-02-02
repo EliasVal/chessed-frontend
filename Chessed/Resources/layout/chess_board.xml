@@ -4,44 +4,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <LinearLayout
+    <RelativeLayout
+        android:minWidth="25px"
+        android:minHeight="25px"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:background="@color/bg_dark"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:padding="10dp"
-        android:layout_above="@id/chessBoard"
-        android:id="@+id/linearLayout2"
-    >
+        android:layout_above="@id/chessBoard">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="John Doe"
+            android:id="@+id/opponentName"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@id/opponentImage"
+        />
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/person"
             android:contentDescription=""
-            android:id="@+id/imageView2" 
+            android:layout_centerHorizontal="true"
+            android:layout_marginHorizontal="10dp"
+            android:id="@+id/opponentImage"
         />
-        <LinearLayout
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginLeft="5dp"
-            android:id="@+id/linearLayout2">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="John Doe"
-                android:id="@+id/textView3" 
-            />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2000 ELO"
-                android:textColor="#7FFFFFFF"
-                android:id="@+id/textView4" 
-                />
-        </LinearLayout>
-    </LinearLayout>
+            android:text="200 ELO"
+            android:textColor="#7FFFFFFF"
+            android:id="@+id/opponentElo" 
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/opponentImage"
+        />
+    </RelativeLayout>
     <GridLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -50,40 +47,39 @@
         android:layout_centerVertical="true"
         android:id="@+id/chessBoard">
     </GridLayout>
-    <LinearLayout
+    <RelativeLayout
+        android:minWidth="25px"
+        android:minHeight="25px"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:background="@color/bg_dark"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:padding="10dp"
-        android:layout_below="@id/chessBoard"
-        
-    >
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/person"
-            android:contentDescription=""
-        />
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginLeft="5dp">
+        android:layout_below="@id/chessBoard">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Jane Doe"
+                android:id="@+id/playerName"
+                android:layout_toLeftOf="@id/playerImage"
+            />
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/person"
+                android:contentDescription=""
+                android:layout_marginHorizontal="10dp"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/playerImage"
             />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="300 ELO"
                 android:textColor="#7FFFFFFF"
-                />
-        </LinearLayout>
-    </LinearLayout>
+                android:id="@+id/playerElo"
+                android:layout_toRightOf="@id/playerImage"
+            />
+    </RelativeLayout>
     <LinearLayout
         android:minWidth="25px"
         android:minHeight="25px"

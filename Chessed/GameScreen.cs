@@ -15,7 +15,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 using static Android.Provider.MediaStore;
 
 namespace Chessed
@@ -37,6 +39,11 @@ namespace Chessed
 
         const Player player = Player.Black;
 
+        Dictionary<string, string> matchData;
+
+        TextView opponentName, playerName;
+        TextView opponentElo, playerElo;
+
 
         //Piece.PieceColor playingAs = Piece.PieceColor.White;
 
@@ -51,12 +58,25 @@ namespace Chessed
 
             chessBoard = FindViewById<GridLayout>(Resource.Id.chessBoard);
 
+            matchData = JsonSerializer.Deserialize<Dictionary<string, string>>(Intent.GetStringExtra("data"));
+
             BuildBoard();
             DrawBoard(gameState.Board);
-            //FillBoard();
 
-            //board.cellGrid[1, 1].occupied = true;
-            //ShowLegalMoves();
+            // Set the details of each player
+            opponentName = FindViewById<TextView>(Resource.Id.opponentName);
+            opponentElo = FindViewById<TextView>(Resource.Id.opponentElo);
+
+            playerName = FindViewById<TextView>(Resource.Id.playerName);
+            playerElo = FindViewById<TextView>(Resource.Id.playerElo);
+
+            opponentName.Text = matchData["playerName"];
+            opponentElo.Text = matchData["playerElo"] + " ELO";
+
+            playerName.Text = Preferences.Get("username", "");
+            playerElo.Text = Preferences.Get("elo", "") + " ELO";
+
+
             Task.Run(async () => await ReadMessage());
         }
 

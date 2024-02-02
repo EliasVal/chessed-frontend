@@ -80,7 +80,7 @@ namespace Chessed
             {
                 RunOnUiThread(() =>
                 {
-                    Intent i = new Intent(this, typeof(GameScreen));
+                    Intent i = new Intent(this, typeof(WaitingForPlayer));
                     StartActivity(i);
                 });
             }
@@ -111,10 +111,11 @@ namespace Chessed
             {
                 Preferences.Set("token", stringRes["token"]);
                 Preferences.Set("username", user.Text);
+                Preferences.Set("elo", "100");
 
                 RunOnUiThread(() =>
                 {
-                    Intent i = new Intent(this, typeof(GameScreen));
+                    Intent i = new Intent(this, typeof(WaitingForPlayer));
                     StartActivity(i);
                 });
             }
@@ -138,9 +139,11 @@ namespace Chessed
             {
                 Preferences.Set("token", stringRes["token"]);
                 Preferences.Set("username", stringRes["username"]);
+                Preferences.Set("elo", stringRes["elo"]);
+
                 RunOnUiThread(() =>
                 {
-                    Intent i = new Intent(this, typeof(GameScreen));
+                    Intent i = new Intent(this, typeof(WaitingForPlayer));
                     StartActivity(i);
                 });
             }

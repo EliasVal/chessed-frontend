@@ -73,7 +73,6 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Board.cs" />
-    <Compile Include="src\Cell.cs" />
     <Compile Include="src\Counting.cs" />
     <Compile Include="src\Direction.cs" />
     <Compile Include="src\EndReason.cs" />
@@ -99,6 +98,7 @@
     <Compile Include="src\Result.cs" />
     <Compile Include="src\Sounds.cs" />
     <Compile Include="src\StateString.cs" />
+    <Compile Include="WaitingForPlayer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -233,6 +233,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\promotionMenu.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\waitingForPlayer.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
