@@ -114,7 +114,19 @@ namespace Chessed
                             Position posEnd = new Position(sqEnd[0], sqEnd[1]);
 
                             OnFromPositionSelected(posStart, false);
-                            OnToPositionSelected(posEnd);
+
+                            if (move.Length > 2)
+                            {
+                                OnToPositionSelected(posEnd, move[2] switch
+                                {
+                                    "q" => PieceType.Queen,
+                                    "r" => PieceType.Rook,
+                                    "n" => PieceType.Knight,
+                                    "b" => PieceType.Bishop,
+                                    _ => null
+                                });
+                            }
+                            else OnToPositionSelected(posEnd);
                         });
                     }
 
@@ -157,27 +169,22 @@ namespace Chessed
             }
         }
 
-        private void OnToPositionSelected(Position pos)
+        private void OnToPositionSelected(Position pos, PieceType? promotioPiece = null)
         {
             selectedPos = null;
             HideHighlights();
 
             if (moveCache.TryGetValue(pos, out Move move))
             {
-                if (gameState.CurrentPlayer == player)
-                {
-                    Task.Run(async () => {
-                        string json = JsonSerializer.Serialize(new { token = Preferences.Get("token", ""), move = $"{move.FromPos}-{move.ToPos}", gameId = matchData["gameId"] });
-                        var byteMessage = System.Text.Encoding.UTF8.GetBytes(json);
-                        var segmnet = new ArraySegment<byte>(byteMessage);
-
-                        await client.SendAsync(segmnet, WebSocketMessageType.Text, true, CancellationToken.None);
-                    });
-                }
-
+                
                 if (move.Type == MoveType.PawnPromotion)
                 {
-                    HandlePromotion(move.FromPos, move.ToPos);
+                    if (promotioPiece == null)
+                        HandlePromotion(move.FromPos, move.ToPos);
+                    else
+                    {
+                        HandleMove(new PawnPromotion(move.FromPos, move.ToPos, (PieceType)promotioPiece));
+                    }
                 }
                 else
                 {
@@ -226,6 +233,31 @@ namespace Chessed
             ImageButton piece = (ImageButton)square.GetChildAt(0);
             bool isEmptySquare = piece.Drawable == null;
 
+            if (gameState.CurrentPlayer == player)
+            {
+                Task.Run(async () => {
+                    string promotionStr = "";
+                    if (move.Type == MoveType.PawnPromotion)
+                    {
+                        promotionStr += "-";
+
+                        promotionStr += ((PawnPromotion)move).newType switch
+                        {
+                            PieceType.Queen => "q",
+                            PieceType.Rook => "r",
+                            PieceType.Knight => "n",
+                            PieceType.Bishop => "b",
+                        };
+                    }
+
+                    string json = JsonSerializer.Serialize(new { token = Preferences.Get("token", ""), move = $"{move.FromPos}-{move.ToPos}{promotionStr}", gameId = matchData["gameId"] });
+                    var byteMessage = System.Text.Encoding.UTF8.GetBytes(json);
+                    var segmnet = new ArraySegment<byte>(byteMessage);
+
+                    await client.SendAsync(segmnet, WebSocketMessageType.Text, true, CancellationToken.None);
+                });
+            }
+
             gameState.MakeMove(move);
             DrawBoard(gameState.Board);
 
@@ -249,6 +281,8 @@ namespace Chessed
             {
                 Sounds.PlaySound(this, "capture");
             }
+
+            
             //SetCursor(gameState.CurrentPlayer);
 
             //if (gameState.IsGameOver())
