@@ -9,6 +9,7 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Chessed.src;
+using Java.Interop;
 using Java.Security.Cert;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,6 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
-using static Android.Provider.MediaStore;
 
 namespace Chessed
 {
@@ -71,10 +71,10 @@ namespace Chessed
             playerElo = FindViewById<TextView>(Resource.Id.playerElo);
 
             opponentName.Text = matchData["playerName"];
-            opponentElo.Text = matchData["playerElo"] + " ELO";
+            opponentElo.Text = matchData["playerElo"] + $" {GetText(Resource.String.elo)}";
 
             playerName.Text = Preferences.Get("username", "");
-            playerElo.Text = Preferences.Get("elo", "") + " ELO";
+            playerElo.Text = Preferences.Get("elo", "") + $" {GetText(Resource.String.elo)}";
 
             player = matchData["color"] == "white" ? Player.White : Player.Black;
 
@@ -99,6 +99,53 @@ namespace Chessed
                     var messageBytes = message.Skip(message.Offset).Take(result.Count).ToArray();
                     string resStr = System.Text.Encoding.UTF8.GetString(messageBytes);
                     Dictionary<string, string> receivedMessage = JsonSerializer.Deserialize<Dictionary<string, string>>(resStr);
+
+                    if (receivedMessage["type"] == "draw_decline")
+                    {
+                        RunOnUiThread(() =>
+                        {
+                            Toast.MakeText(this, GetText(Resource.String.draw_declined), ToastLength.Short).Show();
+                        });
+                    }
+
+                    if (receivedMessage["type"] == "draw_offer")
+                    {
+                        RunOnUiThread(() =>
+                        {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(this, Resource.Style.Dialog);
+
+                            AlertDialog alert = builder.Create();
+                            alert.SetTitle(GetText(Resource.String.draw_received));
+                            alert.SetMessage(GetText(Resource.String.draw_accept));
+                            alert.SetButton2(GetText(Resource.String.yes), (sender, e) =>
+                            {
+                                Task.Run(async () =>
+                                {
+                                    string json = JsonSerializer.Serialize(new { token = Preferences.Get("token", ""), type = "drawAccept", gameId = matchData["gameId"] });
+                                    var byteMessage = System.Text.Encoding.UTF8.GetBytes(json);
+                                    var segmnet = new ArraySegment<byte>(byteMessage);
+
+                                    await client.SendAsync(segmnet, WebSocketMessageType.Text, true, CancellationToken.None);
+                                });
+                            });
+
+                            alert.SetButton(GetText(Resource.String.no), (s, e) =>
+                            {
+                                Task.Run(async () =>
+                                {
+                                    string json = JsonSerializer.Serialize(new { token = Preferences.Get("token", ""), type = "drawDecline", gameId = matchData["gameId"] });
+                                    var byteMessage = System.Text.Encoding.UTF8.GetBytes(json);
+                                    var segmnet = new ArraySegment<byte>(byteMessage);
+
+                                    await client.SendAsync(segmnet, WebSocketMessageType.Text, true, CancellationToken.None);
+                                });
+                            });
+
+                            alert.SetCancelable(false);
+
+                            alert.Show();
+                        });
+                    }
 
                     if (receivedMessage["type"] == "move" || receivedMessage["type"] == "game_over")
                     {
@@ -139,15 +186,25 @@ namespace Chessed
 
                             reason.Text = receivedMessage["winner"] switch
                             {
-                                "white" => "White won by checkmate",
-                                "black" => "Black won by checkmate",
-                                "draw" => "Game drawn",
+                                "white" => GetText(Resource.String.white_won_by),
+                                "black" => GetText(Resource.String.black_won_by),
+                                "draw" => GetText(Resource.String.game_drawn),
                                 _ => ""
+                            };
+
+                            reason.Text += " ";
+
+                            reason.Text += receivedMessage["reason"] switch
+                            {
+                                "checkmate" => GetText(Resource.String.checkmate),
+                                "agreement" => GetText(Resource.String.by_agreement),
+                                "resignation" => GetText(Resource.String.resignation),
+                                _ => receivedMessage["reason"]
                             };
 
                             TextView elo = FindViewById<TextView>(Resource.Id.newElo);
                             int eloDiff = int.Parse(receivedMessage["newElo"]) - int.Parse(Preferences.Get("elo", "0"));
-                            elo.Text = $"New ELO: {receivedMessage["newElo"]} ({(eloDiff >= 0 ? "+" : "")}{eloDiff})";
+                            elo.Text = $"{GetText(Resource.String.new_elo)} {receivedMessage["newElo"]} ({(eloDiff >= 0 ? "+" : "")}{eloDiff})";
 
                             Preferences.Set("elo", receivedMessage["newElo"]);
                         });
@@ -190,10 +247,6 @@ namespace Chessed
                 {
                     HandleMove(move);
                 }
-
-                
-
-                
             }
         }
 
@@ -227,6 +280,55 @@ namespace Chessed
             }
         }
 
+        [Export("ResignBtn")]
+        public void ResignBtn(View v)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, Resource.Style.Dialog);
+
+            AlertDialog alert = builder.Create();
+            alert.SetTitle(GetText(Resource.String.resign));
+            alert.SetMessage(GetText(Resource.String.resign_confirm));
+            alert.SetButton2(GetText(Resource.String.yes), (sender, e) =>
+            {
+                Task.Run(async () => {
+                    string json = JsonSerializer.Serialize(new { token = Preferences.Get("token", ""), type = "resign", gameId = matchData["gameId"] });
+                    var byteMessage = System.Text.Encoding.UTF8.GetBytes(json);
+                    var segmnet = new ArraySegment<byte>(byteMessage);
+
+                    await client.SendAsync(segmnet, WebSocketMessageType.Text, true, CancellationToken.None);
+                });
+            });
+
+            alert.SetButton(GetText(Resource.String.no), (s, e) => { });
+
+            alert.Show();
+        }
+
+
+        [Export("OfferDrawBtn")]
+        public void OfferDrawBtn(View v)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, Resource.Style.Dialog);
+
+            AlertDialog alert = builder.Create();
+            alert.SetTitle(GetText(Resource.String.offer_draw));
+            alert.SetMessage(GetText(Resource.String.draw_confirm));
+            alert.SetButton2(GetText(Resource.String.yes), (sender, e) =>
+            {
+                Task.Run(async () => {
+                    string json = JsonSerializer.Serialize(new { token = Preferences.Get("token", ""), type = "drawOffer", gameId = matchData["gameId"] });
+                    var byteMessage = System.Text.Encoding.UTF8.GetBytes(json);
+                    var segmnet = new ArraySegment<byte>(byteMessage);
+
+                    await client.SendAsync(segmnet, WebSocketMessageType.Text, true, CancellationToken.None);
+                });
+            });
+
+            alert.SetButton(GetText(Resource.String.no), (s, e) => { });
+
+            alert.Show();
+        }
+
         private void HandleMove(Move move)
         {
             FrameLayout square = (FrameLayout)chessBoard.GetChildAt(move.ToPos.Row * 8 + move.ToPos.Column);
@@ -247,6 +349,7 @@ namespace Chessed
                             PieceType.Rook => "r",
                             PieceType.Knight => "n",
                             PieceType.Bishop => "b",
+                            _ => ""
                         };
                     }
 

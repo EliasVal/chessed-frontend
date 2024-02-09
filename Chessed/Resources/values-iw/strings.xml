@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+	<string name="app_name">Chessed</string>
+	<string name="elo">מד כושר</string>
+	<string name="action_settings">action settings</string>
+
+	<string name="email">אימייל</string>
+	<string name="username">שם משתמש</string>
+	<string name="password">סיסמה</string>
+	<string name="sign_in">התחברות</string>
+	<string name="sign_up">הרשמה</string>
+	<string name="new_user">משתמש חדש? הרשמה</string>
+	<string name="existing_user">משתמש קיים? התחברות</string>
+
+	<string name="queen">מלכה</string>
+	<string name="rook">צריח</string>
+	<string name="knight">פרש</string>
+	<string name="bishop">רץ</string>
+	<string name="select_for_promo">נא לבחור כלי בשביל הכתרה</string>
+	<string name="game_over">המשחק נגמר</string>
+	<string name="resign">להיכנע</string>
+	<string name="offer_draw">להציע תיקו</string>
+	<string name="new_elo">מד כושר חדש: </string>
+	<string name="draw_declined">הצעת תיקו נדחתה</string>
+	<string name="draw_received">התקבלה הצעה לתיקו</string>
+	<string name="draw_accept">לאשר את הצעת התיקו של היריב?</string>
+	<string name="resign_confirm">את/ה בטוח/ה שאת/ה רוצה להיכנע?</string>
+	<string name="draw_confirm">את/ה בטוח/ה שאת/ה רוצה להציע תיקו?</string>
+	<string name="yes">כן</string>
+	<string name="no">לא</string>
+	<string name="checkmate">מט</string>
+	<string name="by_agreement">ע\"י הסכמה</string>
+
+	<string name="white_won_by">לבן ניצח ע\"י</string>
+	<string name="black_won_by">שחור ניצח ע\"י</string>
+	<string name="resignation">היכנעות</string>
+	<string name="game_drawn">המשחק הוכרע בתיקו</string>
+</resources>

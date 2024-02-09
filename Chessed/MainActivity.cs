@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 namespace Chessed
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ConfigurationChanges = Android.Content.PM.ConfigChanges.Locale)]
     public class MainActivity : AppCompatActivity
     {
         EditText pass, user, email;
@@ -161,16 +161,16 @@ namespace Chessed
             if (mode)
             {
                 user.Visibility = ViewStates.Invisible;
-                actionBtn.Text = "Sign In";
-                actionSwitch.Text = "Not a user? Sign up";
+                actionBtn.Text = GetText(Resource.String.sign_in);
+                actionSwitch.Text = GetText(Resource.String.new_user);
 
                 actionBtn.Click += SignIn_Click;
                 actionBtn.Click -= SignUp_Click;
             }
             else {
                 user.Visibility = ViewStates.Visible;
-                actionBtn.Text = "Sign Up";
-                actionSwitch.Text = "Already a user? Sign in";
+                actionBtn.Text = GetText(Resource.String.sign_up);
+                actionSwitch.Text = GetText(Resource.String.existing_user);
 
                 actionBtn.Click += SignUp_Click;
                 actionBtn.Click -= SignIn_Click;

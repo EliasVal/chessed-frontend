@@ -15,7 +15,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="John Doe"
             android:id="@+id/opponentName"
             android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@id/opponentImage"
@@ -32,9 +31,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="200 ELO"
             android:textColor="#7FFFFFFF"
             android:id="@+id/opponentElo" 
+            android:textDirection="ltr"
             android:layout_alignParentBottom="true"
             android:layout_toRightOf="@id/opponentImage"
         />
@@ -58,7 +57,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Jane Doe"
                 android:id="@+id/playerName"
                 android:layout_toLeftOf="@id/playerImage"
             />
@@ -74,49 +72,79 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="300 ELO"
                 android:textColor="#7FFFFFFF"
                 android:id="@+id/playerElo"
+                android:textDirection="ltr"
                 android:layout_toRightOf="@id/playerImage"
             />
     </RelativeLayout>
     <LinearLayout
         android:minWidth="25px"
         android:minHeight="25px"
+        android:paddingHorizontal="25dp"
+        android:paddingVertical="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true">
-        <ImageButton
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@drawable/flagIcon"
-            android:contentDescription=""
-            android:scaleType="fitCenter"
-            android:backgroundTint="@android:color/transparent"
-        />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageButton
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_margin="2.5dp"
+                android:padding="0dp"
+                android:src="@drawable/flagIcon"
+                android:contentDescription=""
+                android:scaleType="fitCenter"
+                android:backgroundTint="@android:color/transparent"
+                android:onClick="ResignBtn"
+                android:tint="@android:color/background_light" 
+            />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/resign"/>
+        </LinearLayout>
         <Space
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_weight="1"/>
 
-        <ImageButton
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@drawable/handShakeIcon"
-            android:contentDescription=""
-            android:scaleType="fitCenter"
-            android:backgroundTint="@android:color/transparent"
-        />
-        <Space
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="0dp"
+                android:src="@drawable/handShakeIcon"
+                android:contentDescription=""
+                android:scaleType="fitCenter"
+                android:backgroundTint="@android:color/transparent"
+                android:onClick="OfferDrawBtn"
+                android:tint="@android:color/background_light" 
+            />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/offer_draw"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+<!--        <Space
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_weight="1"/>
         <ImageView
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
             android:src="@drawable/rb"
-            />
+            />-->
     </LinearLayout>
     <RelativeLayout
         android:minWidth="25px"
@@ -137,13 +165,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Game over"
+                android:text="@string/game_over"
                 android:layout_gravity="center_horizontal"
             />
             <TextView
                 android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
-                android:text="Black won by checkmate"
                 android:id="@+id/gameOverReason"
             />
             <TextView
@@ -151,7 +179,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:id="@+id/newElo"
-                android:text="New ELO: "/>
+                android:text="@string/new_elo"/>
         </LinearLayout>
     </RelativeLayout>
     <RelativeLayout
@@ -173,7 +201,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select a piece for promotion"
+                android:text="@string/select_for_promo"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="10dp"/>
             <LinearLayout
@@ -184,19 +212,19 @@
                 <ImageButton
                     android:src="@drawable/bq"
                     style="@style/promotionButton"
-                    android:contentDescription="Queen" />
+                    android:contentDescription="@string/queen" />
                 <ImageButton
                     style="@style/promotionButton"
                     android:src="@drawable/rb"
-                    android:contentDescription="Rook" />
+                    android:contentDescription="@string/rook" />
                 <ImageButton
                     style="@style/promotionButton"
                     android:src="@drawable/bb"
-                    android:contentDescription="Bishop" />
+                    android:contentDescription="@string/bishop" />
                 <ImageButton
                     style="@style/promotionButton"
                     android:src="@drawable/nb"
-                    android:contentDescription="Knight" />
+                    android:contentDescription="@string/knight" />
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

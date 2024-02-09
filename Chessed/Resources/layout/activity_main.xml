@@ -12,7 +12,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chessed"
+        android:text="@string/app_name"
         android:gravity="center"
         android:textSize="35dp"
         android:layout_marginBottom="150px"
@@ -23,14 +23,14 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
         <EditText
-            android:hint="Username"
+            android:hint="@string/username"
             android:id="@+id/usernameEt"
             android:inputType="text"
             style="@style/inputField"
             android:visibility="invisible"
         />
         <EditText
-            android:hint="E-Mail"
+            android:hint="@string/email"
             android:inputType="textEmailAddress"
             style="@style/inputField"
             android:id="@+id/emailEt"
@@ -38,7 +38,7 @@
         <EditText
             android:inputType="textPassword"
             android:id="@+id/passwordEt"
-            android:hint="Password"
+            android:hint="@string/password"
             style="@style/inputField"
             android:password="true"
         />
@@ -51,7 +51,7 @@
         android:layout_marginBottom="200px"
         >
         <Button
-            android:text="Sign in"
+            android:text="@string/sign_in"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/actionBtn"
@@ -61,7 +61,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Not a user? Sign up"
+            android:text="@string/new_user"
             android:gravity="center"
             android:id="@+id/actionSwitch"
             android:clickable="true"
