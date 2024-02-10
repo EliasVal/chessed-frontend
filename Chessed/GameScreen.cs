@@ -364,6 +364,17 @@ namespace Chessed
             gameState.MakeMove(move);
             DrawBoard(gameState.Board);
 
+            //Toast.MakeText(this, GenerateMovePgn(move, !isEmptySquare || move.Type == MoveType.EnPassant), ToastLength.Short).Show();
+
+            string moveStr = GenerateMovePgn(move, !isEmptySquare || move.Type == MoveType.EnPassant);
+            if (gameState.CurrentPlayer == Player.Black)
+            {
+                moveStr = $"{gameState.moves}. {moveStr}";
+            }
+
+            TextView moves = (TextView)FindViewById<RelativeLayout>(Resource.Id.moves).GetChildAt(0);
+            moves.Text += $" {moveStr}";
+
             if (gameState.Board.IsInCheck(gameState.CurrentPlayer))
             {
                 Sounds.PlaySound(this, "check");
@@ -384,14 +395,69 @@ namespace Chessed
             {
                 Sounds.PlaySound(this, "capture");
             }
+        }
 
+        private string GenerateMovePgn(Move move, bool isCapture)
+        {
+            string moveStr = "";
+
+            Piece p = gameState.Board[move.ToPos.Row, move.ToPos.Column];
+
+            moveStr += p.Type switch
+            {
+                PieceType.Queen => "Q",
+                PieceType.Rook => "R",
+                PieceType.Knight => "N",
+                PieceType.Bishop => "B",
+                PieceType.King => "K",
+                PieceType.Pawn => abc[move.FromPos.Column],
+                _ => ""
+            };
+
+            // Without this, it will think that the piece is not a pawn, but the piece it was promoted to
+            if (move.Type == MoveType.PawnPromotion) moveStr = abc[move.FromPos.Column].ToString();
+
+            if (isCapture)
+            {
+                moveStr += "x";
+            }
             
-            //SetCursor(gameState.CurrentPlayer);
+            if (p.Type == PieceType.Pawn)
+            {
+                if (isCapture) moveStr += abc[move.ToPos.Column];
+                moveStr += 8 - move.ToPos.Row;
+            }
+            else
+            {
+                moveStr += abc[move.ToPos.Column];
+                moveStr += 8 - move.ToPos.Row;
+            }
 
-            //if (gameState.IsGameOver())
-            //{
-            //    Toast.MakeText(this, "GAME OVER", ToastLength.Short).Show();
-            //}
+            if (move.Type == MoveType.PawnPromotion)
+            {
+                moveStr += "=";
+                moveStr += ((PawnPromotion)move).newType switch
+                {
+                    PieceType.Queen => "Q",
+                    PieceType.Rook => "R",
+                    PieceType.Knight => "N",
+                    PieceType.Bishop => "B",
+                    _ => ""
+                };
+            }
+
+            if (move.Type == MoveType.CastleKS) moveStr = "O-O";
+            if (move.Type == MoveType.CastleQS) moveStr = "O-O-O";
+
+            if (gameState.Board.IsInCheck(gameState.CurrentPlayer))
+            {
+                if (gameState.IsGameOver())
+                    moveStr += "#";
+                else
+                    moveStr += "+";
+            }
+
+            return moveStr;
         }
 
         private void CacheMoves(IEnumerable<Move> moves)

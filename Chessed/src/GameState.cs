@@ -12,6 +12,8 @@ namespace Chessed
         private int noCaptureOrPawnMoves = 0;
         private string stateString;
 
+        public int moves { get; private set; } = 1;
+
         private readonly Dictionary<string, int> stateHistory = new Dictionary<string, int>();
 
         public GameState(Player player, Board board)
@@ -53,6 +55,7 @@ namespace Chessed
             CurrentPlayer = CurrentPlayer.Opponent();
             UpdateStateString();
             CheckForGameOver();
+            if (CurrentPlayer == Player.White) moves++;
         }
 
         public IEnumerable<Move> AllLegalMovesFor(Player player)

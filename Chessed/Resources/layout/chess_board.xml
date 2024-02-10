@@ -11,7 +11,7 @@
         android:layout_height="60dp"
         android:background="@color/bg_dark"
         android:padding="10dp"
-        android:layout_above="@id/chessBoard">
+        android:layout_above="@id/moves">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,6 +38,17 @@
             android:layout_toRightOf="@id/opponentImage"
         />
     </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_above="@id/chessBoard"
+        android:id="@+id/moves">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:singleLine="true"
+            android:ellipsize="start" />
+        </RelativeLayout>
     <GridLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

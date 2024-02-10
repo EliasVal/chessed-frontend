@@ -31,8 +31,6 @@ namespace Chessed
         Button actionBtn;
         TextView actionSwitch;
 
-        //ClientWebSocket client = Client.Instance.client;
-
         HttpClient client = new HttpClient()
         {
             BaseAddress = new Uri("http://192.168.1.238:3000")
@@ -46,14 +44,18 @@ namespace Chessed
 
         CancellationTokenSource cts = new CancellationTokenSource();
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            if (Client.Instance.client.State == WebSocketState.Open)
+            {
+                Client.Instance.client.CloseAsync(WebSocketCloseStatus.NormalClosure, "", default);
+            }
+        }
+
         protected async override void OnCreate(Bundle savedInstanceState)
         {
-            //Task.Run(async () =>
-            //{
-            //    if (client.State != WebSocketState.Open && client.State != WebSocketState.Connecting)
-            //        await client.ConnectAsync(new Uri("ws://192.168.1.238:8080"), cts.Token);
-            //});
-            
             base.OnCreate(savedInstanceState);
 
             //Preferences.Clear();
@@ -71,6 +73,7 @@ namespace Chessed
                     if (res.StatusCode == HttpStatusCode.Unauthorized)
                     {
                         Preferences.Set("token", "");
+                        RunOnUiThread(() => Toast.MakeText(this, "RESET TOKEN", ToastLength.Short).Show());
                     }
                     validToken = false;
                 }
@@ -179,11 +182,6 @@ namespace Chessed
             }
 
             mode = !mode;
-        }
-
-        class ApiHttpRes
-        {
-            public string data { get; set; }
         }
     }
 }
