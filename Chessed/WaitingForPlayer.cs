@@ -1,9 +1,11 @@
 ﻿using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using Java.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,7 @@ using Xamarin.Essentials;
 
 namespace Chessed
 {
-    [Activity(Label = "GameScreen")]
+    [Activity(Label = "GameScreen", ScreenOrientation = ScreenOrientation.Portrait)]
     internal class WaitingForPlayer : Activity
     {
 
@@ -28,7 +30,12 @@ namespace Chessed
         {
             base.OnCreate(savedInstanceState);
             
-            RunOnUiThread(() => SetContentView(Resource.Layout.waitingForPlayer));
+            RunOnUiThread(() => {
+                SetContentView(Resource.Layout.waitingForPlayer);
+
+                ViewGroup root = FindViewById<ViewGroup>(Resource.Id.Root);
+                this.ShowLoadingSpinner(root);
+            });
 
             await client.ConnectAsync(new Uri($"ws://192.168.1.238:8080?token={Preferences.Get("token", "")}"), CancellationToken.None);
 
@@ -61,6 +68,7 @@ namespace Chessed
                     if (res["type"] == "match_start")
                     {
                         RunOnUiThread(() => {
+                            this.HideLoadingSpinner();
                             Intent i = new Intent(this, typeof(GameScreen));
                             i.PutExtra("data", receivedMessage);
                             StartActivity(i);
@@ -71,6 +79,14 @@ namespace Chessed
                 }
                 while (!result.EndOfMessage);
             }
+        }
+
+        [Export("CancelSearchBtn")]
+        public void CancelSearchBtn(View v)
+        {
+            client.Dispose();
+            Client.Instance.client = new ClientWebSocket();
+            Finish();
         }
     }
 }

@@ -35,4 +35,12 @@
 	<string name="black_won_by">שחור ניצח ע\"י</string>
 	<string name="resignation">היכנעות</string>
 	<string name="game_drawn">המשחק הוכרע בתיקו</string>
+
+	<string name="welcome_back">ברוך שובך</string>
+	<string name="wins">נצחונות</string>
+	<string name="losses">הפסדים</string>
+	<string name="draws">תיקו</string>
+	<string name="start_game">התחל משחק</string>
+	<string name="waiting_for_player">ממתין לשחקן...</string>
+	<string name="cancel_search">בטל חיפוש</string>
 </resources>

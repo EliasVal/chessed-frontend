@@ -21,10 +21,11 @@ using System.Text.Json;
 using Xamarin.Essentials;
 using Java.Util;
 using System.Collections.Generic;
+using Android.Content.PM;
 
 namespace Chessed
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ConfigurationChanges = Android.Content.PM.ConfigChanges.Locale)]
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.Locale, ScreenOrientation = ScreenOrientation.Portrait)]
     public class MainActivity : AppCompatActivity
     {
         EditText pass, user, email;
@@ -83,7 +84,7 @@ namespace Chessed
             {
                 RunOnUiThread(() =>
                 {
-                    Intent i = new Intent(this, typeof(WaitingForPlayer));
+                    Intent i = new Intent(this, typeof(MainMenu));
                     StartActivity(i);
                 });
             }
@@ -115,10 +116,11 @@ namespace Chessed
                 Preferences.Set("token", stringRes["token"]);
                 Preferences.Set("username", user.Text);
                 Preferences.Set("elo", "100");
+                Preferences.Set("uid", stringRes["uid"]);
 
                 RunOnUiThread(() =>
                 {
-                    Intent i = new Intent(this, typeof(WaitingForPlayer));
+                    Intent i = new Intent(this, typeof(MainMenu));
                     StartActivity(i);
                 });
             }
@@ -142,11 +144,12 @@ namespace Chessed
             {
                 Preferences.Set("token", stringRes["token"]);
                 Preferences.Set("username", stringRes["username"]);
+                Preferences.Set("uid", stringRes["uid"]);
                 Preferences.Set("elo", stringRes["elo"]);
 
                 RunOnUiThread(() =>
                 {
-                    Intent i = new Intent(this, typeof(WaitingForPlayer));
+                    Intent i = new Intent(this, typeof(MainMenu));
                     StartActivity(i);
                 });
             }

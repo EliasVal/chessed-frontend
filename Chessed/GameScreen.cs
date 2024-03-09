@@ -1,21 +1,15 @@
 ﻿using Android.App;
-using Android.Bluetooth;
 using Android.Content;
-using Android.Media;
+using Android.Content.PM;
 using Android.OS;
-using Android.Runtime;
-using Android.Service.Autofill;
-using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Chessed.src;
 using Java.Interop;
-using Java.Security.Cert;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,8 +17,8 @@ using Xamarin.Essentials;
 
 namespace Chessed
 {
-    [Activity(Label = "GameScreen")]
-    public class GameScreen : Activity//, View.IOnClickListener
+    [Activity(Label = "GameScreen", ScreenOrientation = ScreenOrientation.Portrait)]
+    public class GameScreen : Activity
     {
         readonly string abc = "abcdefgh";
         GridLayout chessBoard;
@@ -32,7 +26,7 @@ namespace Chessed
         private Position selectedPos = null;
 
 
-        //Board board;
+        bool gameOver = false;
 
         private readonly Dictionary<Position, Move> moveCache = new Dictionary<Position, Move>();
 
@@ -88,7 +82,6 @@ namespace Chessed
         {
             while (client.State == WebSocketState.Open)
             {
-
                 WebSocketReceiveResult result;
                 var message = new ArraySegment<byte>(new byte[4096]);
                 do
@@ -179,6 +172,7 @@ namespace Chessed
 
                     if (receivedMessage["type"] == "game_over")
                     {
+                        gameOver = true;
                         RunOnUiThread(() =>
                         {
                             FindViewById(Resource.Id.gameoverScreen).Visibility = ViewStates.Visible;
@@ -283,6 +277,8 @@ namespace Chessed
         [Export("ResignBtn")]
         public void ResignBtn(View v)
         {
+            if (gameOver) return;
+
             AlertDialog.Builder builder = new AlertDialog.Builder(this, Resource.Style.Dialog);
 
             AlertDialog alert = builder.Create();
@@ -308,6 +304,8 @@ namespace Chessed
         [Export("OfferDrawBtn")]
         public void OfferDrawBtn(View v)
         {
+            if (gameOver) return;
+
             AlertDialog.Builder builder = new AlertDialog.Builder(this, Resource.Style.Dialog);
 
             AlertDialog alert = builder.Create();
@@ -484,40 +482,8 @@ namespace Chessed
             foreach (Position to in moveCache.Keys)
             {
                 ((ImageButton)((FrameLayout)chessBoard.GetChildAt(to.Row * 8 + to.Column)).GetChildAt(0)).SetBackgroundColor(Resources.GetColor(((to.Row + to.Column) % 2 == 1) ? Resource.Color.board_dark : Resource.Color.board_light, Theme));
-                //highlights[to.Row, to.Column].Fill = new SolidColorBrush(color);
             }
         }
-
-        //public void OnClick(View v)
-        //{
-        //    Log.Debug("SCREEN", "PRESSED OUTER");
-
-        //    //if (gameState.CurrentPlayer != player) return;
-            
-        //    // TODO: Check if chess piece 
-        //    //if (board.turnOf != playingAs)
-        //    //{
-        //    //    return;
-        //    //}
-
-        //}
-
-        //public void ShowLegalMoves()
-        //{
-        //    board.MarkLegalMoves(board.cellGrid[0, 1], Piece.PieceType.Knight);
-
-        //    for (int i = 0; i < board.BoardSize; i++)
-        //    {
-        //        for (int j = 0; j < board.BoardSize; j++)
-        //        {
-        //            ImageButton square = (ImageButton)((FrameLayout)chessBoard.GetChildAt((i * 8) + j)).GetChildAt(0);
-
-        //            if (board.cellGrid[i, j].legalNextMove) square.SetBackgroundColor(Resources.GetColor(Resource.Color.black, Theme));
-        //            if (board.cellGrid[i, j].occupied) square.SetBackgroundColor(Resources.GetColor(Resource.Color.selectedYellow, Theme));
-
-        //        }
-        //    }
-        //}
 
         void BuildBoard()
         {
@@ -601,6 +567,7 @@ namespace Chessed
 
         private void SquareClick(object sender, EventArgs e)
         {
+            if (gameOver) return;
             if (gameState.CurrentPlayer != player) return;
 
             int[] sq = Board.PositionFromStr(((View)sender).TransitionName);
