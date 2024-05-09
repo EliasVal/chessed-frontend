@@ -7,11 +7,15 @@ using Android.Runtime;
 using Android.Service.Autofill;
 using Android.Views;
 using Android.Widget;
+using Java.Lang;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using static Android.Gms.Common.Apis.Api;
 
 namespace Chessed
 {

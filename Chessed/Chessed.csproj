@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
+    <Compile Include="CustomHttpClient.cs" />
     <Compile Include="GameScreen.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="MainMenu.cs" />
@@ -260,6 +261,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\spinner.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\matchCard.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

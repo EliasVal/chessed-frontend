@@ -20,9 +20,9 @@ namespace Chessed
     [Activity(Label = "main_menu", ScreenOrientation = ScreenOrientation.Portrait)]
     public class MainMenu : Activity
     {
-        Dictionary<string, string> userData = null;
+        dynamic userData = null;
 
-        HttpClient client = new HttpClient()
+        CustomHttpClient client = new CustomHttpClient()
         {
             BaseAddress = new Uri("http://192.168.1.238:3000")
         };
@@ -53,30 +53,39 @@ namespace Chessed
 
         async void FetchUserData()
         {
-            using StringContent stringContent = new StringContent(JsonSerializer.Serialize(new { uid = Preferences.Get("uid", "") }), Encoding.UTF8, "application/json");
-            HttpResponseMessage res = await client.PostAsync("/get_profile", stringContent);
-            string t = await res.Content.ReadAsStringAsync();
-
-            if (res.IsSuccessStatusCode)
+            try
             {
-                userData = JsonSerializer.Deserialize<Dictionary<string, string>>(await res.Content.ReadAsStringAsync());
-
-                RunOnUiThread(() =>
-                {
-                    ELOTv.Text = $"{userData["elo"]} {GetText(Resource.String.elo)}";
-                    UsernameTv.Text = $"{GetText(Resource.String.welcome_back)}, {userData["username"]}";
-                    WinsTv.Text = $"{userData["wins"]} {GetText(Resource.String.wins)}";
-                    DrawsTv.Text = $"{userData["draws"]} {GetText(Resource.String.draws)}";
-                    LossesTv.Text = $"{userData["losses"]} {GetText(Resource.String.losses)}";
-                    this.HideLoadingSpinner();
-                    FindViewById(Resource.Id.content).Visibility = ViewStates.Visible;
-                });
+                userData = await client.MakeHTTPReq("/get_profile", new { uid = Preferences.Get("uid", "") });
             }
-            else
+            catch
             {
                 Toast.MakeText(this, "Failed to fetch user data, please try again later", ToastLength.Short);
                 Preferences.Clear();
                 Finish();
+            }
+
+            ShowMatches();
+
+            // Update UI with user's data
+            RunOnUiThread(() =>
+            {
+                ELOTv.Text = $"{userData["elo"]} {GetText(Resource.String.elo)}";
+                UsernameTv.Text = $"{GetText(Resource.String.welcome_back)}, {userData["username"]}";
+                WinsTv.Text = $"{userData["wins"]} {GetText(Resource.String.wins)}";
+                DrawsTv.Text = $"{userData["draws"]} {GetText(Resource.String.draws)}";
+                LossesTv.Text = $"{userData["losses"]} {GetText(Resource.String.losses)}";
+                this.HideLoadingSpinner();
+                FindViewById(Resource.Id.content).Visibility = ViewStates.Visible;
+            });
+        }
+
+        async void ShowMatches()
+        {
+            Dictionary<string, string> matches = userData.matches;
+
+            foreach (string matchId in matches.Keys)
+            {
+
             }
         }
 
