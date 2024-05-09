@@ -43,4 +43,5 @@
 	<string name="start_game">התחל משחק</string>
 	<string name="waiting_for_player">ממתין לשחקן...</string>
 	<string name="cancel_search">בטל חיפוש</string>
+	<string name="prevMatches">משחקים קודמים</string>
 </resources>

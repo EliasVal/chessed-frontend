@@ -22,6 +22,7 @@ using Xamarin.Essentials;
 using Java.Util;
 using System.Collections.Generic;
 using Android.Content.PM;
+using System.Text.Json.Nodes;
 
 namespace Chessed
 {
@@ -32,7 +33,7 @@ namespace Chessed
         Button actionBtn;
         TextView actionSwitch;
 
-        HttpClient client = new HttpClient()
+        CustomHttpClient client = new CustomHttpClient()
         {
             BaseAddress = new Uri("http://192.168.1.238:3000")
         };
@@ -42,8 +43,6 @@ namespace Chessed
         /// <br>true = signup</br>
         /// </summary>
         bool mode = false;
-
-        CancellationTokenSource cts = new CancellationTokenSource();
 
         protected override void OnDestroy()
         {
@@ -59,37 +58,26 @@ namespace Chessed
         {
             base.OnCreate(savedInstanceState);
 
-            //Preferences.Clear();
-
-            bool validToken = true;
-            if (Preferences.Get("token", "") == "") validToken = false;
-
-            if (validToken)
+            try
             {
-                using StringContent stringContent = new StringContent(JsonSerializer.Serialize(new { token = Preferences.Get("token", "") }), Encoding.UTF8, "application/json");
-                using HttpResponseMessage res = await client.PostAsync("validate_token", stringContent);
+                if (Preferences.Get("token", "") == "") throw new Exception();
+                await client.MakeHTTPReq("/validate_token", new { token = Preferences.Get("token", "") });
 
-                if (res.StatusCode != HttpStatusCode.OK)
-                {
-                    if (res.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        Preferences.Set("token", "");
-                        RunOnUiThread(() => Toast.MakeText(this, "RESET TOKEN", ToastLength.Short).Show());
-                    }
-                    validToken = false;
-                }
-            }
-
-            if (validToken)
-            {
+                // On success
                 RunOnUiThread(() =>
                 {
                     Intent i = new Intent(this, typeof(MainMenu));
                     StartActivity(i);
                 });
             }
-            else
+            catch (Exception ex)
             {
+                if (ex.Message == "401")
+                {
+                    Preferences.Set("token", "");
+                    RunOnUiThread(() => Toast.MakeText(this, "RESET TOKEN", ToastLength.Short).Show());
+                }
+
                 RunOnUiThread(() => {
                     SetContentView(Resource.Layout.activity_main);
                     pass = FindViewById<EditText>(Resource.Id.passwordEt);
@@ -98,25 +86,26 @@ namespace Chessed
                     actionBtn = FindViewById<Button>(Resource.Id.actionBtn);
                     actionSwitch = FindViewById<TextView>(Resource.Id.actionSwitch);
 
-                    actionBtn.Click += SignIn_Click;
+                    actionBtn.Click += Auth_Click;
                 });
             }
         }
 
-        private async void SignUp_Click(object sender, EventArgs e)
+        private async void Auth_Click(object sender, EventArgs e)
         {
             actionBtn.Clickable = false;
-            using StringContent stringContent = new StringContent(JsonSerializer.Serialize(new { username = user.Text, password = pass.Text, email = email.Text }), Encoding.UTF8, "application/json");
-            using HttpResponseMessage res = await client.PostAsync("signup", stringContent);
 
-            Dictionary<string, string> stringRes = JsonSerializer.Deserialize<Dictionary<string, string>>(await res.Content.ReadAsStringAsync());
-
-            if (res.StatusCode == HttpStatusCode.OK)
+            try
             {
-                Preferences.Set("token", stringRes["token"]);
-                Preferences.Set("username", user.Text);
-                Preferences.Set("elo", "100");
-                Preferences.Set("uid", stringRes["uid"]);
+                JsonObject res;
+
+                if (mode) res = await client.MakeHTTPReq("/signup", new { username = user.Text, password = pass.Text, email = email.Text });
+                else res = await client.MakeHTTPReq("/login", new { password = pass.Text, email = email.Text });
+
+                Preferences.Set("token", res["token"].ToString());
+                Preferences.Set("username", res["username"].ToString());
+                Preferences.Set("elo", res["elo"].ToString());
+                Preferences.Set("uid", res["uid"].ToString());
 
                 RunOnUiThread(() =>
                 {
@@ -124,65 +113,22 @@ namespace Chessed
                     StartActivity(i);
                 });
             }
-            else
+            catch (Exception ex)
             {
-                RunOnUiThread(() => Toast.MakeText(this, stringRes["error"], ToastLength.Short).Show());
+                RunOnUiThread(() => Toast.MakeText(this, ex.InnerException.Message, ToastLength.Short).Show());
             }
-            actionBtn.Clickable = true;
-        }
-
-        private async void SignIn_Click(object sender, EventArgs e)
-        {
-            actionBtn.Clickable = false;
-
-            using StringContent stringContent = new StringContent(JsonSerializer.Serialize(new { password = pass.Text, email = email.Text }), Encoding.UTF8, "application/json");
-            using HttpResponseMessage res = await client.PostAsync("login", stringContent);
-
-            Dictionary<string, string> stringRes = JsonSerializer.Deserialize<Dictionary<string, string>>(await res.Content.ReadAsStringAsync());
-
-            if (res.StatusCode == HttpStatusCode.OK)
+            finally
             {
-                Preferences.Set("token", stringRes["token"]);
-                Preferences.Set("username", stringRes["username"]);
-                Preferences.Set("uid", stringRes["uid"]);
-                Preferences.Set("elo", stringRes["elo"]);
-
-                RunOnUiThread(() =>
-                {
-                    Intent i = new Intent(this, typeof(MainMenu));
-                    StartActivity(i);
-                });
+                actionBtn.Clickable = true;
             }
-            else
-            {
-                RunOnUiThread(() => Toast.MakeText(this, stringRes["error"], ToastLength.Short).Show());
-            }
-
-            actionBtn.Clickable = true;
         }
 
         [Export("ActionSwitch")]
         public void ActionSwitch_Click(View view)
         {
-            if (mode)
-            {
-                user.Visibility = ViewStates.Invisible;
-                actionBtn.Text = GetText(Resource.String.sign_in);
-                actionSwitch.Text = GetText(Resource.String.new_user);
-
-                actionBtn.Click += SignIn_Click;
-                actionBtn.Click -= SignUp_Click;
-            }
-            else {
-                user.Visibility = ViewStates.Visible;
-                actionBtn.Text = GetText(Resource.String.sign_up);
-                actionSwitch.Text = GetText(Resource.String.existing_user);
-
-                actionBtn.Click += SignUp_Click;
-                actionBtn.Click -= SignIn_Click;
-
-
-            }
+            user.Visibility = mode ? ViewStates.Invisible : ViewStates.Invisible;
+            actionBtn.Text = mode ? GetText(Resource.String.sign_in) : GetText(Resource.String.sign_up);
+            actionSwitch.Text = mode ? GetText(Resource.String.new_user) : GetText(Resource.String.existing_user);
 
             mode = !mode;
         }

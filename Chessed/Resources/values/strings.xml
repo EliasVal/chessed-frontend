@@ -42,4 +42,5 @@
 	<string name="start_game">Start Game</string>
 	<string name="waiting_for_player">Waiting for player...</string>
 	<string name="cancel_search">Cancel Search</string>
+	<string name="prevMatches">Previous Matches</string>
 </resources>

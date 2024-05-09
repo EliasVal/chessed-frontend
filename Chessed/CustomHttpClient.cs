@@ -10,23 +10,26 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace Chessed
 {
     class CustomHttpClient : HttpClient
     {
-        public async Task<dynamic> MakeHTTPReq(string route, dynamic obj, string returnType = "application/json")
+        public async Task<JsonObject> MakeHTTPReq(string route, dynamic obj, string returnType = "application/json")
         {
-            using StringContent stringContent = new StringContent(JsonSerializer.Serialize(obj, Encoding.UTF8, returnType));
-            HttpResponseMessage res = await PostAsync(route, stringContent);
+            using StringContent stringContent = new StringContent(JsonSerializer.Serialize(obj), Encoding.UTF8, returnType);
+            using HttpResponseMessage res = await PostAsync(route, stringContent);
 
-            if (res.IsSuccessStatusCode)
+            JsonObject content = JsonSerializer.Deserialize<JsonObject>(await res.Content.ReadAsStringAsync());
+
+            if (res.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                return JsonSerializer.Deserialize<dynamic>(await res.Content.ReadAsStringAsync());
+                return content;
             }
 
-            else throw new Exception(res.StatusCode.ToString());
+            else throw new Exception(res.StatusCode.ToString(), new Exception(content["error"].ToString()));
         }
     }
 }

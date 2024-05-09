@@ -14,5 +14,7 @@
 	<color name="bg_light">#2B2B2B</color>
 	<color name="bg_dark">#202020</color>
 	<color name="success">#65C842</color>
+	<color name="danger">#AD1818</color>
+	<color name="warning">#DFB624</color>
 	<color name="green">#0E7D0B</color>
 </resources>

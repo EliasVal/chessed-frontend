@@ -39,7 +39,7 @@
 				android:layout_height="20dp"
 				android:contentDescription=""
 				android:tag="player1king"
-				android:src="@drawable/kb"/>
+				android:src="@drawable/kw"/>
 		</LinearLayout>
 	</LinearLayout>
 	<Space
