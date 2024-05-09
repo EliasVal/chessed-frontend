@@ -327,6 +327,12 @@ namespace Chessed
             alert.Show();
         }
 
+        [Export("ExitBtn")]
+        public void ExitBtn(View v)
+        {
+            Finish();
+        }
+
         private void HandleMove(Move move)
         {
             FrameLayout square = (FrameLayout)chessBoard.GetChildAt(move.ToPos.Row * 8 + move.ToPos.Column);

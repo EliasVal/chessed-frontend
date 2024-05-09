@@ -22,6 +22,7 @@ namespace Chessed
     [Activity(Label = "GameScreen", ScreenOrientation = ScreenOrientation.Portrait)]
     internal class WaitingForPlayer : Activity
     {
+        bool hasStarted = false;
 
         ClientWebSocket client = Client.Instance.client;
 
@@ -87,6 +88,14 @@ namespace Chessed
             client.Dispose();
             Client.Instance.client = new ClientWebSocket();
             Finish();
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            if (hasStarted) CancelSearchBtn(null);
+            else hasStarted = true;
         }
     }
 }

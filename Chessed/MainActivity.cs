@@ -1,28 +1,19 @@
 ﻿using System;
 using Android.App;
 using Android.OS;
-using Android.Runtime;
 using Android.Views;
-using AndroidX.AppCompat.Widget;
 using AndroidX.AppCompat.App;
-using Google.Android.Material.FloatingActionButton;
-using Google.Android.Material.Snackbar;
 using Android.Content;
 using Android.Widget;
 using Java.Interop;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Net;
-using System.Net.Http;
-using System.Text.Json;
 using Xamarin.Essentials;
-using Java.Util;
-using System.Collections.Generic;
 using Android.Content.PM;
-using System.Text.Json.Nodes;
+using Firebase;
+using Firebase.Auth;
+using Android.Gms.Extensions;
+using Android.Runtime;
 
 namespace Chessed
 {
@@ -32,6 +23,8 @@ namespace Chessed
         EditText pass, user, email;
         Button actionBtn;
         TextView actionSwitch;
+
+        FirebaseAuth auth;
 
         CustomHttpClient client = new CustomHttpClient()
         {
@@ -44,6 +37,8 @@ namespace Chessed
         /// </summary>
         bool mode = false;
 
+        bool initialized = false;
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -54,16 +49,75 @@ namespace Chessed
             }
         }
 
-        protected async override void OnCreate(Bundle savedInstanceState)
+        void InitMenu()
+        {
+            SetContentView(Resource.Layout.activity_main);
+            pass = FindViewById<EditText>(Resource.Id.passwordEt);
+            user = FindViewById<EditText>(Resource.Id.usernameEt);
+            email = FindViewById<EditText>(Resource.Id.emailEt);
+            actionBtn = FindViewById<Button>(Resource.Id.actionBtn);
+            actionSwitch = FindViewById<TextView>(Resource.Id.actionSwitch);
+
+            actionBtn.Click += Auth_Click;
+
+            initialized = true;
+        }
+
+        protected override async void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
+            if (FirebaseApp.Instance == null) FirebaseApp.InitializeApp(this);
+
+            auth = FirebaseAuth.GetInstance(FirebaseApp.Instance);
+
+            if (auth.CurrentUser == null)
+            {
+                Preferences.Clear();
+                RunOnUiThread(InitMenu);
+            }
+            else
+            {
+                Preferences.Set("uid", auth.CurrentUser.Uid);
+
+                GetTokenResult t = await auth.CurrentUser.GetIdToken(true).AsAsync<GetTokenResult>();
+                Preferences.Set("token", t.Token);
+
+                RunOnUiThread(() =>
+                {
+                    Intent i = new Intent(this, typeof(MainMenu));
+                    StartActivityForResult(i, 0);
+                });
+            }
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            if (FirebaseApp.Instance == null) return;
+
+            if (initialized)
+            {
+                user.Text = "";
+                pass.Text = "";
+                email.Text = "";
+            }
+            else InitMenu();
+        }
+
+        private async Task SignIn()
+        {
             try
             {
-                if (Preferences.Get("token", "") == "") throw new Exception();
-                await client.MakeHTTPReq("/validate_token", new { token = Preferences.Get("token", "") });
+                IAuthResult res = await auth.SignInWithEmailAndPasswordAsync(email.Text, pass.Text);
 
-                // On success
+                Preferences.Set("uid", res.User.Uid);
+
+                GetTokenResult t = await res.User.GetIdToken(true).AsAsync<GetTokenResult>();
+
+                Preferences.Set("token", t.Token);
+
                 RunOnUiThread(() =>
                 {
                     Intent i = new Intent(this, typeof(MainMenu));
@@ -72,61 +126,38 @@ namespace Chessed
             }
             catch (Exception ex)
             {
-                if (ex.Message == "401")
-                {
-                    Preferences.Set("token", "");
-                    RunOnUiThread(() => Toast.MakeText(this, "RESET TOKEN", ToastLength.Short).Show());
-                }
-
-                RunOnUiThread(() => {
-                    SetContentView(Resource.Layout.activity_main);
-                    pass = FindViewById<EditText>(Resource.Id.passwordEt);
-                    user = FindViewById<EditText>(Resource.Id.usernameEt);
-                    email = FindViewById<EditText>(Resource.Id.emailEt);
-                    actionBtn = FindViewById<Button>(Resource.Id.actionBtn);
-                    actionSwitch = FindViewById<TextView>(Resource.Id.actionSwitch);
-
-                    actionBtn.Click += Auth_Click;
-                });
+                RunOnUiThread(() => Toast.MakeText(this, ex.Message, ToastLength.Short).Show());
             }
         }
 
-        private async void Auth_Click(object sender, EventArgs e)
+        private async Task SignUp()
         {
-            actionBtn.Clickable = false;
-
             try
             {
-                JsonObject res;
+                await client.MakeHTTPReq("/signup", new { username = user.Text, password = pass.Text, email = email.Text });
 
-                if (mode) res = await client.MakeHTTPReq("/signup", new { username = user.Text, password = pass.Text, email = email.Text });
-                else res = await client.MakeHTTPReq("/login", new { password = pass.Text, email = email.Text });
-
-                Preferences.Set("token", res["token"].ToString());
-                Preferences.Set("username", res["username"].ToString());
-                Preferences.Set("elo", res["elo"].ToString());
-                Preferences.Set("uid", res["uid"].ToString());
-
-                RunOnUiThread(() =>
-                {
-                    Intent i = new Intent(this, typeof(MainMenu));
-                    StartActivity(i);
-                });
+                await SignIn();
             }
             catch (Exception ex)
             {
                 RunOnUiThread(() => Toast.MakeText(this, ex.InnerException.Message, ToastLength.Short).Show());
             }
-            finally
-            {
-                actionBtn.Clickable = true;
-            }
+        }
+
+        private async void Auth_Click(object sender, EventArgs e)
+        {
+            RunOnUiThread(() => actionBtn.Clickable = false);
+
+            if (mode) await SignUp();
+            else await SignIn();
+
+            RunOnUiThread(() => actionBtn.Clickable = true);
         }
 
         [Export("ActionSwitch")]
         public void ActionSwitch_Click(View view)
         {
-            user.Visibility = mode ? ViewStates.Invisible : ViewStates.Invisible;
+            user.Visibility = mode ? ViewStates.Invisible : ViewStates.Visible;
             actionBtn.Text = mode ? GetText(Resource.String.sign_in) : GetText(Resource.String.sign_up);
             actionSwitch.Text = mode ? GetText(Resource.String.new_user) : GetText(Resource.String.existing_user);
 

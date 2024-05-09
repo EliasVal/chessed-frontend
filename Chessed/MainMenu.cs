@@ -6,6 +6,8 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using Firebase;
+using Firebase.Auth;
 using Java.Interop;
 using System;
 using System.Collections.Generic;
@@ -59,9 +61,12 @@ namespace Chessed
         {
             try
             {
-                userData = await client.MakeHTTPReq("/get_profile", new { uid = Preferences.Get("uid", "") });
+                userData = await client.MakeHTTPReq("/get_profile", new { uid = Preferences.Get("uid", ""), needMatches = "true" });
+
+                Preferences.Set("elo", userData["elo"].ToString());
+                Preferences.Set("username", userData["username"].ToString());
             }
-            catch
+            catch (Exception ex)
             {
                 Toast.MakeText(this, "Failed to fetch user data, please try again later", ToastLength.Short);
                 Preferences.Clear();
@@ -87,6 +92,12 @@ namespace Chessed
 
         async void ShowMatches()
         {
+            if (userData["matches"] == null)
+            {
+                FindViewById(Resource.Id.matchesRoot).Visibility = ViewStates.Gone;
+                return;
+            }
+
             JsonObject matches = userData["matches"].AsObject();
 
             RunOnUiThread(() =>
@@ -148,7 +159,12 @@ namespace Chessed
                         ((TextView)card.FindViewWithTag("reason")).Text = resultText;
                         ((TextView)card.FindViewWithTag("reason")).SetTextColor(Resources.GetColor(resultColor, Theme));
 
-                        FindViewById<LinearLayout>(Resource.Id.matchesContent).AddView(cgard);
+                        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                        p.SetMargins(0, 20, 0, 20);
+
+                        card.LayoutParameters = p;
+
+                        FindViewById<LinearLayout>(Resource.Id.matchesContent).AddView(card);
                     });
 
                 }
@@ -170,6 +186,17 @@ namespace Chessed
             Intent i = new Intent(this, typeof(WaitingForPlayer));
 
             StartActivity(i);
+        }
+
+        [Export("SignOutBtn")]
+        public void SignOutBtn(View v)
+        {
+            FirebaseAuth auth = FirebaseAuth.GetInstance(FirebaseApp.Instance);
+            auth.SignOut();
+            Preferences.Clear();
+
+            //SetResult(Android.App.Result.Ok);
+            Finish();
         }
     }
 }
