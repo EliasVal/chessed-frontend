@@ -85,7 +85,8 @@ namespace Chessed
 
                 RunOnUiThread(() =>
                 {
-                    Intent i = new Intent(this, typeof(MainMenu));
+                    Intent i = new Intent(this, typeof(Leaderboard));
+                    //Intent i = new Intent(this, typeof(MainMenu));
                     StartActivityForResult(i, 0);
                 });
             }
