@@ -19,5 +19,6 @@
         android:layout_height="wrap_content"
         android:onClick="CancelSearchBtn"
         android:text="@string/cancel_search"
+        android:backgroundTint="@color/danger"
         />
 </LinearLayout>

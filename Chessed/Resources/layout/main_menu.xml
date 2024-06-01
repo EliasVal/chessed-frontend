@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:fillViewport="true"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -93,22 +92,37 @@
                 <ImageButton
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/logout"
                     android:contentDescription=""
-                    android:background="@null"
+                    android:background="@drawable/logout"
                     android:scaleType="fitCenter"
                     android:onClick="SignOutBtn"/>
             </LinearLayout>
 
-            <Button
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/start_game"
+                android:orientation="horizontal"
+                android:gravity="center"
                 android:layout_marginVertical="10dp"
-                android:layout_gravity="center_horizontal"
-                android:onClick="StartGameBtn"
-                android:backgroundTint="@color/green" 
-            />
+            >
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:text="@string/start_game"
+                    android:layout_gravity="center_horizontal"
+                    android:onClick="StartGameBtn"
+                    android:backgroundTint="@color/green" 
+                />
+                <ImageButton
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/trophy"
+                    android:contentDescription=""
+                    android:padding="10dp"
+                    android:onClick="OpenLbBtn"
+                    android:backgroundTint="@color/warning"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -123,13 +137,21 @@
                     android:padding="10dp"
                     android:layout_marginBottom="10dp"
                     android:text="@string/prevMatches"/>
-                <LinearLayout
+                <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:id="@+id/matchesContent"/>
+                    android:fillViewport="true"
+                    android:overScrollMode="ifContentScrolls"
+                >
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:id="@+id/matchesContent"
+                    />
+                </ScrollView>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</ScrollView>
+</LinearLayout>

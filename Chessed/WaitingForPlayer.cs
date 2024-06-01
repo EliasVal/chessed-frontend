@@ -80,6 +80,16 @@ namespace Chessed
                 }
                 while (!result.EndOfMessage);
             }
+
+            Dictionary<string, string> closeData = JsonSerializer.Deserialize<Dictionary<string, string>>(client.CloseStatusDescription);
+            RunOnUiThread(() =>
+            {
+                if (closeData["type"] == "close")
+                {
+                    Toast.MakeText(this, closeData["data"], ToastLength.Short).Show();
+                    CancelSearchBtn(null);
+                }
+            });
         }
 
         [Export("CancelSearchBtn")]
@@ -96,6 +106,16 @@ namespace Chessed
 
             if (hasStarted) CancelSearchBtn(null);
             else hasStarted = true;
+        }
+
+        public override bool OnKeyDown([GeneratedEnum] Keycode keyCode, KeyEvent e)
+        {
+            if (keyCode == Keycode.Back && e.Action == KeyEventActions.Down)
+            {
+                CancelSearchBtn(null);
+                return true;
+            }
+            return base.OnKeyDown(keyCode, e);
         }
     }
 }

@@ -10,7 +10,7 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:padding="5dp"
         android:text="Lichess public leaderboard"
         android:gravity="center_horizontal"
@@ -36,17 +36,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/lbPlayers"
             android:orientation="vertical">
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="50"
-                android:background="@color/bg_dark"
-                android:layout_height="wrap_content">
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:src="@drawable/person"/>
-                </LinearLayout>
+            
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

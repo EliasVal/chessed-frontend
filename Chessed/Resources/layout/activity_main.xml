@@ -7,65 +7,74 @@
     android:layout_height="match_parent"
     android:accessibilityHeading="false"
     android:orientation="vertical"
-    android:gravity="center"
+    android:id="@id/Root"
     >
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
+        android:layout_height="match_parent"
         android:gravity="center"
-        android:textSize="35dp"
-        android:layout_marginBottom="150px"
-    />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal">
-        <EditText
-            android:hint="@string/username"
-            android:id="@+id/usernameEt"
-            android:inputType="text"
-            style="@style/inputField"
-            android:visibility="invisible"
-        />
-        <EditText
-            android:hint="@string/email"
-            android:inputType="textEmailAddress"
-            style="@style/inputField"
-            android:id="@+id/emailEt"
-        />
-        <EditText
-            android:inputType="textPassword"
-            android:id="@+id/passwordEt"
-            android:hint="@string/password"
-            style="@style/inputField"
-            android:password="true"
-        />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:layout_marginBottom="200px"
-        >
-        <Button
-            android:text="@string/sign_in"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/actionBtn"
-            android:layout_marginTop="50px"
-            app:backgroundTint="@color/green"
-            android:paddingHorizontal="25dp"/>
+        android:id="@id/content"
+        android:visibility="gone"
+    >
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/new_user"
+            android:text="@string/app_name"
             android:gravity="center"
-            android:id="@+id/actionSwitch"
-            android:clickable="true"
-            android:onClick="ActionSwitch"
+            android:textSize="35dp"
+            android:layout_marginBottom="150px"
         />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+            <EditText
+                android:hint="@string/username"
+                android:id="@+id/usernameEt"
+                android:inputType="text"
+                style="@style/inputField"
+                android:visibility="invisible"
+            />
+            <EditText
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                style="@style/inputField"
+                android:id="@+id/emailEt"
+            />
+            <EditText
+                android:inputType="textPassword"
+                android:id="@+id/passwordEt"
+                android:hint="@string/password"
+                style="@style/inputField"
+                android:password="true"
+            />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="200px"
+            >
+            <Button
+                android:text="@string/sign_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/actionBtn"
+                android:layout_marginTop="50px"
+                app:backgroundTint="@color/green"
+                android:paddingHorizontal="25dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/new_user"
+                android:gravity="center"
+                android:id="@+id/actionSwitch"
+                android:clickable="true"
+                android:onClick="ActionSwitch"
+            />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

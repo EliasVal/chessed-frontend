@@ -6,6 +6,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using AndroidX.ConstraintLayout.Widget;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,12 +31,18 @@ namespace Chessed
             public string? title;
         }
 
+        class LichessApiResult
+        {
+            public LichessUser[] users;
+        }
+
 
         readonly string[] leaderboards = new string[] { "ultraBullet", "bullet", "blitz", "rapid", "classical", "chess960", "crazyhouse", "antichess", "atomic", "horde", "kingOfTheHill", "racingKings", "threeCheck" };
         Dictionary<string, Button> lbButtons = new Dictionary<string, Button>();
         string selected = "";
 
-        LinearLayout lbButtonsContainer;
+        LinearLayout lbButtonsContainer,
+                     lbPlayersContainer;
 
         Thread th = null;
 
@@ -50,6 +57,7 @@ namespace Chessed
             SetContentView(Resource.Layout.public_leaderboard);
 
             lbButtonsContainer = FindViewById<LinearLayout>(Resource.Id.lbButtons);
+            lbPlayersContainer = FindViewById<LinearLayout>(Resource.Id.lbPlayers);
 
             for (int i = 0; i < leaderboards.Length; i++)
             {
@@ -101,12 +109,40 @@ namespace Chessed
         async void FetchLb()
         {
             string t = selected;
+            string res = await client.GetStringAsync($"https://lichess.org/api/player/top/50/{t}");
 
-            Thread.Sleep(3000);
-            JsonObject str = JsonSerializer.Deserialize<JsonObject>(await client.GetStringAsync($"https://lichess.org/api/player/top/10/{t}"));
+            JsonArray obj = JsonSerializer.Deserialize<JsonObject>(res)["users"].AsArray();
 
-            RunOnUiThread(() => Toast.MakeText(this, $"Successfully fetched {t}", ToastLength.Short).Show());
-            //return;
+            RunOnUiThread(() => lbPlayersContainer.RemoveAllViews());
+
+            int count = 1;
+            foreach (JsonNode user in obj)
+            {
+                RunOnUiThread(() => {
+                    ConstraintLayout card = (ConstraintLayout)LayoutInflater.Inflate(Resource.Drawable.playerCard, null);
+
+                    ((TextView)card.FindViewWithTag("playerName")).Text = user["username"].ToString();
+                    TextView title = ((TextView)card.FindViewWithTag("playerTitle"));
+
+                    if (user["title"] == null) title.Visibility = ViewStates.Gone;
+                    else
+                    {
+                        title.Visibility = ViewStates.Visible;
+                        title.Text = user["title"].ToString();
+                    }
+
+                    ((TextView)card.FindViewWithTag("playerElo")).Text = GetText(Resource.String.elo) + $" {user["perfs"][t]["rating"]}";
+                    ((TextView)card.FindViewWithTag("playerPlacement")).Text = $"#{count}";
+                    count++;
+
+                    ConstraintLayout.LayoutParams p = new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                    p.SetMargins(0, 20, 0, 20);
+
+                    card.LayoutParameters = p;
+
+                    lbPlayersContainer.AddView(card);
+                });
+            }
         }
     }
 }

@@ -2,8 +2,10 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using Android.Window;
 using Chessed.src;
 using Java.Interop;
 using System;
@@ -598,7 +600,6 @@ namespace Chessed
                     ImageButton ib = (ImageButton)((FrameLayout)chessBoard.GetChildAt(8 * i + j)).GetChildAt(0);
 
                     Piece piece = board[i, j];
-                    //pieceImages[r, c].Source = Images.GetImage(piece);
 
                     if (PieceImages.GetImage(piece) != 0) ib.SetImageDrawable(Resources.GetDrawable(PieceImages.GetImage(piece), Theme));
                     else ib.SetImageDrawable(null);
@@ -609,6 +610,17 @@ namespace Chessed
             {
                 chessBoard.Rotation = 180;
             }
+        }
+
+        public override bool OnKeyDown([GeneratedEnum] Keycode keyCode, KeyEvent e)
+        {
+            if (keyCode == Keycode.Back && e.Action == KeyEventActions.Down)
+            {
+                if (gameOver) Finish();
+                else ResignBtn(null);
+                return true;
+            }
+            return base.OnKeyDown(keyCode, e);
         }
     }
 }

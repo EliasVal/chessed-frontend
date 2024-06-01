@@ -9,14 +9,17 @@ using Android.Widget;
 using Firebase;
 using Firebase.Auth;
 using Java.Interop;
+using Java.Sql;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Net.Http;
+using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using static Android.Icu.Text.ListFormatter;
@@ -34,6 +37,10 @@ namespace Chessed
         };
 
         TextView ELOTv, UsernameTv, WinsTv, DrawsTv, LossesTv;
+        LinearLayout matchesContent;
+
+        int width = 0;
+        int height = 0;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -41,18 +48,49 @@ namespace Chessed
 
             SetContentView(Resource.Layout.main_menu);
 
-            int width = Resources.DisplayMetrics.WidthPixels;
-            int height = Resources.DisplayMetrics.HeightPixels;
-
-            FindViewById(Resource.Id.content).Visibility = ViewStates.Gone;
-
-            this.ShowLoadingSpinner(FindViewById<ViewGroup>(Resource.Id.Root), width, height);
+            width = Resources.DisplayMetrics.WidthPixels;
+            height = Resources.DisplayMetrics.HeightPixels;
 
             ELOTv = FindViewById<TextView>(Resource.Id.playerElo);
             UsernameTv = FindViewById<TextView>(Resource.Id.playerName);
             WinsTv = FindViewById<TextView>(Resource.Id.winCount);
             DrawsTv = FindViewById<TextView>(Resource.Id.drawCount);
             LossesTv = FindViewById<TextView>(Resource.Id.lossCount);
+
+            matchesContent = FindViewById<LinearLayout>(Resource.Id.matchesContent);
+        }
+
+        public override bool OnKeyDown([GeneratedEnum] Keycode keyCode, KeyEvent e)
+        {
+            if (keyCode == Keycode.Back && e.Action == KeyEventActions.Down)
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this, Resource.Style.Dialog);
+
+                AlertDialog alert = builder.Create();
+                alert.SetMessage("Are you sure you want to exit?");
+                //alert.SetMessage(GetText(Resource.String.draw_confirm));
+                alert.SetButton2(GetText(Resource.String.yes), (sender, e) =>
+                {
+                    //Application.Dispose();
+                    FinishAffinity();
+                });
+
+                alert.SetButton(GetText(Resource.String.no), (s, e) => { });
+
+                alert.Show();
+
+                return true;
+            }
+            return base.OnKeyDown(keyCode, e);
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            FindViewById(Resource.Id.content).Visibility = ViewStates.Gone;
+
+            this.ShowLoadingSpinner(FindViewById<ViewGroup>(Resource.Id.Root), width, height);
 
             FetchUserData();
         }
@@ -92,6 +130,8 @@ namespace Chessed
 
         async void ShowMatches()
         {
+            List<JsonObject> matchesArr = new List<JsonObject>();
+
             if (userData["matches"] == null)
             {
                 FindViewById(Resource.Id.matchesRoot).Visibility = ViewStates.Gone;
@@ -103,6 +143,7 @@ namespace Chessed
             RunOnUiThread(() =>
             {
                 this.ShowLoadingSpinner(FindViewById<ViewGroup>(Resource.Id.matchesRoot));
+                matchesContent.RemoveAllViews();
             });
 
             foreach (var match in matches)
@@ -115,6 +156,18 @@ namespace Chessed
                     string blackName = res["black"]["id"].ToString() == Preferences.Get("uid", "") ? userData["username"].ToString() : null;
 
                     string toSearch = whiteName == null ? res["white"]["id"].ToString() : res["black"]["id"].ToString();
+
+                    if (!userCache.ContainsKey(toSearch))
+                    {
+                        JsonObject userDataRes = await client.MakeHTTPReq("/get_profile", new { uid = toSearch });
+
+                        userCache.Add(toSearch, userDataRes["username"].ToString());
+                    }
+
+                    res["playedAs"] = whiteName == null ? "black" : "white";
+
+                    whiteName ??= userCache[toSearch];
+                    blackName ??= userCache[toSearch];
 
                     string resultText = "";
 
@@ -138,34 +191,12 @@ namespace Chessed
 
                     resultText += $" by {res["reason"]}";
 
+                    res["resultColor"] = resultColor.ToString();
+                    res["resultText"] = resultText;
+                    res["whiteName"] = whiteName;
+                    res["blackName"] = blackName;
 
-                    if (!userCache.ContainsKey(toSearch))
-                    {
-                        JsonObject userDataRes = await client.MakeHTTPReq("/get_profile", new { uid = toSearch });
-
-                        userCache.Add(toSearch, userDataRes["username"].ToString());
-                    }
-
-                    
-
-                    RunOnUiThread(() =>
-                    {
-                        LinearLayout card = (LinearLayout)LayoutInflater.Inflate(Resource.Drawable.matchCard, null);
-
-                        ((TextView)card.FindViewWithTag("player1Name")).Text = whiteName == null ? userCache[res["white"]["id"].ToString()] : whiteName;
-                        ((TextView)card.FindViewWithTag("player1elo")).Text = $"{GetText(Resource.String.elo)}: {res["white"]["elo"]}";
-                        ((TextView)card.FindViewWithTag("player2Name")).Text = blackName == null ? userCache[res["black"]["id"].ToString()] : blackName;
-                        ((TextView)card.FindViewWithTag("player2elo")).Text = $"{GetText(Resource.String.elo)}: {res["black"]["elo"]}";
-                        ((TextView)card.FindViewWithTag("reason")).Text = resultText;
-                        ((TextView)card.FindViewWithTag("reason")).SetTextColor(Resources.GetColor(resultColor, Theme));
-
-                        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
-                        p.SetMargins(0, 20, 0, 20);
-
-                        card.LayoutParameters = p;
-
-                        FindViewById<LinearLayout>(Resource.Id.matchesContent).AddView(card);
-                    });
+                    matchesArr.Add(res);
 
                 }
                 catch /*(Exception ex)*/ {
@@ -173,10 +204,41 @@ namespace Chessed
                 };
             }
 
+            matchesArr.Reverse();
+
             RunOnUiThread(() =>
             {
+                foreach (JsonObject match in matchesArr)
+                {
+                    string me = match["playedAs"].ToString();
+                    string opp = me == "white" ? "black" : "white";
+
+                    LinearLayout card = (LinearLayout)LayoutInflater.Inflate(Resource.Drawable.matchCard, null);
+
+                    ((TextView)card.FindViewWithTag("player1Name")).Text = match[$"{me}Name"].ToString();
+                    ((TextView)card.FindViewWithTag("player2Name")).Text = match[$"{opp}Name"].ToString();
+
+                    ((TextView)card.FindViewWithTag("player1elo")).Text = $"{GetText(Resource.String.elo)}: {match[me]["elo"]}";
+                    ((TextView)card.FindViewWithTag("player2elo")).Text = $"{GetText(Resource.String.elo)}: {match[opp]["elo"]}";
+
+
+                    ((ImageView)card.FindViewWithTag("player1king")).SetImageDrawable(Resources.GetDrawable(me == "white" ? Resource.Drawable.kw : Resource.Drawable.kb, Theme));
+                    ((ImageView)card.FindViewWithTag("player2king")).SetImageDrawable(Resources.GetDrawable(opp == "white" ? Resource.Drawable.kw : Resource.Drawable.kb, Theme));
+
+                    ((TextView)card.FindViewWithTag("reason")).Text = match["resultText"].ToString();
+                    ((TextView)card.FindViewWithTag("reason")).SetTextColor(Resources.GetColor(int.Parse(match["resultColor"].ToString()), Theme));
+
+
+                    LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+                    p.SetMargins(0, 20, 0, 20);
+
+                    card.LayoutParameters = p;
+
+                    matchesContent.AddView(card);
+                }
+
                 this.HideLoadingSpinner();
-                FindViewById(Resource.Id.matchesContent).Visibility = ViewStates.Visible;
+                matchesContent.Visibility = ViewStates.Visible;
             });
         }
 
@@ -197,6 +259,14 @@ namespace Chessed
 
             //SetResult(Android.App.Result.Ok);
             Finish();
+        }
+
+        [Export("OpenLbBtn")]
+        public void OpenLbBtn(View v)
+        {
+            Intent intent = new Intent(this, typeof(Leaderboard));
+
+            StartActivity(intent);
         }
     }
 }

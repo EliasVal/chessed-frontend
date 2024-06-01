@@ -164,7 +164,7 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:id="@+id/gameoverScreen"
-        android:visibility="visible"
+        android:visibility="gone"
         android:background="#AA2b2b2b">
         <LinearLayout
             android:layout_width="wrap_content"

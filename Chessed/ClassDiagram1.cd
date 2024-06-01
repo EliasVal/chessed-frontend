@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Chessed.ApplicationLoader" Collapsed="true">
+    <Position X="14.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ApplicationLoader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Client" Collapsed="true">
+    <Position X="18" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAABAAAAAQAAABAAAAAA=</HashCode>
+      <FileName>Client.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.CustomHttpClient" Collapsed="true">
+    <Position X="21.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>CustomHttpClient.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.GameScreen" Collapsed="true">
+    <Position X="16.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAKIAAAACAAEARACEAAEBAALIECgADACBgDAAAgIA=</HashCode>
+      <FileName>GameScreen.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Leaderboard" Collapsed="true">
+    <Position X="19.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAIAAAAAAAAAAAQAAAEACEAAAQAIAAABggAAAA=</HashCode>
+      <FileName>Leaderboard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.MainActivity" Collapsed="true">
+    <Position X="21.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAGAABAACAikAAAAAAAAACAAAAAAEAgADBACCQA=</HashCode>
+      <FileName>MainActivity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.MainMenu" Collapsed="true">
+    <Position X="14.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEgAAAAACgCAAAwAQRAEAAgAICIAAAACAAAABAAEAAA=</HashCode>
+      <FileName>MainMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Board" Collapsed="true">
+    <Position X="16.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EABAAAAIABAIgKBACAAYAEQAEgAAAQAgQAIAAAAAAKQ=</HashCode>
+      <FileName>src\Board.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Counting" Collapsed="true">
+    <Position X="19.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAABAAAIAAAAAAABAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>src\Counting.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Direction" Collapsed="true">
+    <Position X="14.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACCCABABAAAAAAwAYAAAAAAAEAAAAAAAAAAAAAABAAQ=</HashCode>
+      <FileName>src\Direction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.GameState" Collapsed="true">
+    <Position X="18" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAIAAAAAAEAAgACAAAAARAQAAAAgAAAEAAgCCAgAA=</HashCode>
+      <FileName>src\GameState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Castle" Collapsed="true">
+    <Position X="1.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAASEAAAAAAAAAAAAAAAAIQQAAAAAAAA=</HashCode>
+      <FileName>src\Moves\Castle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.DoublePawn" Collapsed="true">
+    <Position X="4" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAgAAIQAAAAAAAAA=</HashCode>
+      <FileName>src\Moves\DoublePawn.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.EnPassant" Collapsed="true">
+    <Position X="6.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIQAAAAAAAAAAAAAAAAAIQAAAAAAAAA=</HashCode>
+      <FileName>src\Moves\EnPassant.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Move" Collapsed="true">
+    <Position X="6.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAAIQAAAAAAAAA=</HashCode>
+      <FileName>src\Moves\Move.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.NormalMove" Collapsed="true">
+    <Position X="8.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAIQAAAAAAAAA=</HashCode>
+      <FileName>src\Moves\NormalMove.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.PawnPromotion" Collapsed="true">
+    <Position X="10.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAgAAAAAAIQIAAAAAAAA=</HashCode>
+      <FileName>src\Moves\PawnPromotion.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.PieceImages" Collapsed="true">
+    <Position X="16.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAAAQAEAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\PieceImages.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Bishop" Collapsed="true">
+    <Position X="3" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAQAAAAAAgAAAAAAAQAAgAAAAAA=</HashCode>
+      <FileName>src\Pieces\Bishop.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.King" Collapsed="true">
+    <Position X="7.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAEAAQDAAAAAAAQAAEAAAgAAAAAAAQAAgAAAAEA=</HashCode>
+      <FileName>src\Pieces\King.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Knight" Collapsed="true">
+    <Position X="9.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAACAAQAAAAAAgAAAAAAAQAAgAAAAAA=</HashCode>
+      <FileName>src\Pieces\Knight.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Pawn" Collapsed="true">
+    <Position X="12" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAgEAAAEAAAAAAASgAAAAAgAAAAAAAQCAgAAAAAA=</HashCode>
+      <FileName>src\Pieces\Pawn.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Piece" Collapsed="true">
+    <Position X="6.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgABAAEAAAAAAAAAAAQAAAAAAgAAABAAAQAAgAAAAAA=</HashCode>
+      <FileName>src\Pieces\Piece.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Queen" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAQAAAAAAgAAAAAAAQAAgAAAAAA=</HashCode>
+      <FileName>src\Pieces\Queen.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Rook" Collapsed="true">
+    <Position X="5.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAQAAAAAAgAAAAAAAQAAgAAAAAA=</HashCode>
+      <FileName>src\Pieces\Rook.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.PlayerExtensions" Collapsed="true">
+    <Position X="18" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Player.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Position" Collapsed="true">
+    <Position X="19.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEwABAAAQAAAAAAoAAAAAAAAAAAiA=</HashCode>
+      <FileName>src\Position.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Result" Collapsed="true">
+    <Position X="21.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgIAAECAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Result.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.StateString" Collapsed="true">
+    <Position X="16.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAgAAAGAAAAAAAEAAAgAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>src\StateString.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.Utils" Collapsed="true">
+    <Position X="18" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAEAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAQAA=</HashCode>
+      <FileName>Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.WaitingForPlayer" Collapsed="true">
+    <Position X="19.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAgAAAAACABAACIAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>WaitingForPlayer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chessed.src.Sounds" Collapsed="true">
+    <Position X="14.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAAAEAAAAAAACAAAAAAA=</HashCode>
+      <FileName>src\Sounds.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Chessed.EndReason" Collapsed="true">
+    <Position X="14.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAEAAAACAAAAAAAAAAgAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>src\EndReason.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Chessed.MoveType" Collapsed="true">
+    <Position X="16.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAAJAAAAAAQAAAEABAA=</HashCode>
+      <FileName>src\MoveType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Chessed.PieceType" Collapsed="true">
+    <Position X="18" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAEggAAAAEAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\PieceType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Chessed.Player" Collapsed="true">
+    <Position X="19.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>src\Player.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

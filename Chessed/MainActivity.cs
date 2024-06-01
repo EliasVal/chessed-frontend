@@ -51,7 +51,6 @@ namespace Chessed
 
         void InitMenu()
         {
-            SetContentView(Resource.Layout.activity_main);
             pass = FindViewById<EditText>(Resource.Id.passwordEt);
             user = FindViewById<EditText>(Resource.Id.usernameEt);
             email = FindViewById<EditText>(Resource.Id.emailEt);
@@ -60,6 +59,8 @@ namespace Chessed
 
             actionBtn.Click += Auth_Click;
 
+            FindViewById<LinearLayout>(Resource.Id.content).Visibility = ViewStates.Visible;
+
             initialized = true;
         }
 
@@ -67,7 +68,14 @@ namespace Chessed
         {
             base.OnCreate(savedInstanceState);
 
-            if (FirebaseApp.Instance == null) FirebaseApp.InitializeApp(this);
+
+            RunOnUiThread(() => {
+                int width = Resources.DisplayMetrics.WidthPixels;
+                int height = Resources.DisplayMetrics.HeightPixels;
+
+                SetContentView(Resource.Layout.activity_main);
+                this.ShowLoadingSpinner(FindViewById<LinearLayout>(Resource.Id.Root), width, height);
+            });
 
             auth = FirebaseAuth.GetInstance(FirebaseApp.Instance);
 
@@ -80,14 +88,14 @@ namespace Chessed
             {
                 Preferences.Set("uid", auth.CurrentUser.Uid);
 
-                GetTokenResult t = await auth.CurrentUser.GetIdToken(true).AsAsync<GetTokenResult>();
+                GetTokenResult t = await auth.CurrentUser.GetIdToken(false).AsAsync<GetTokenResult>();
                 Preferences.Set("token", t.Token);
 
                 RunOnUiThread(() =>
                 {
-                    Intent i = new Intent(this, typeof(Leaderboard));
-                    //Intent i = new Intent(this, typeof(MainMenu));
-                    StartActivityForResult(i, 0);
+                    //Intent i = new Intent(this, typeof(Leaderboard));
+                    Intent i = new Intent(this, typeof(MainMenu));
+                    StartActivity(i);
                 });
             }
         }
@@ -96,7 +104,7 @@ namespace Chessed
         {
             base.OnResume();
 
-            if (FirebaseApp.Instance == null) return;
+            if (auth.CurrentUser != null) return;
 
             if (initialized)
             {
@@ -105,6 +113,12 @@ namespace Chessed
                 email.Text = "";
             }
             else InitMenu();
+        }
+
+        protected override void OnPause()
+        {
+            this.HideLoadingSpinner();
+            base.OnPause();
         }
 
         private async Task SignIn()
