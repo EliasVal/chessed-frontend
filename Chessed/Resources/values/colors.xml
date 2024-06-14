@@ -10,6 +10,8 @@
 	<color name="selectedYellow">#FFFF00</color>
 	<color name="board_dark">#696561</color>
 	<color name="board_light">#CFCAAF</color>
+	<color name="board_dark_moved">#8e873e</color>
+	<color name="board_light_moved">#b6ae58</color>
 	<color name="board_select">#bc941c</color>
 	<color name="bg_light">#2B2B2B</color>
 	<color name="bg_dark">#202020</color>

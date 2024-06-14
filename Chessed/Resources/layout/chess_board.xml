@@ -11,6 +11,7 @@
         android:layout_height="60dp"
         android:background="@color/bg_dark"
         android:padding="10dp"
+        android:id="@+id/opponentCard"
         android:layout_above="@id/moves">
         <TextView
             android:layout_width="wrap_content"
@@ -64,6 +65,7 @@
         android:layout_height="60dp"
         android:background="@color/bg_dark"
         android:padding="10dp"
+        android:id="@+id/playerCard"
         android:layout_below="@id/chessBoard">
             <TextView
                 android:layout_width="wrap_content"

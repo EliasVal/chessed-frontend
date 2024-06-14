@@ -12,7 +12,6 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
@@ -38,7 +37,12 @@ namespace Chessed
                 this.ShowLoadingSpinner(root);
             });
 
-            await client.ConnectAsync(new Uri($"ws://192.168.1.238:8080?token={Preferences.Get("token", "")}"), CancellationToken.None);
+#if DEBUG
+            string url = "192.168.1.238:8080";
+#else
+            string url = "chessed-ac171.oa.r.appspot.com";
+#endif
+            await client.ConnectAsync(new Uri($"ws://{url}/connect?token={Preferences.Get("token", "")}"), CancellationToken.None);
 
 #pragma warning disable CS4014
             Task.Run(async () => await ReadMessage());

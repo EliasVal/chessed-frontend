@@ -5,7 +5,6 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using Android.Window;
 using Chessed.src;
 using Java.Interop;
 using System;
@@ -41,6 +40,8 @@ namespace Chessed
         TextView opponentName, playerName;
         TextView opponentElo, playerElo;
 
+        Move lastMove = null;
+
 
         //Piece.PieceColor playingAs = Piece.PieceColor.White;
 
@@ -73,6 +74,7 @@ namespace Chessed
             playerElo.Text = Preferences.Get("elo", "") + $" {GetText(Resource.String.elo)}";
 
             player = matchData["color"] == "white" ? Player.White : Player.Black;
+            HighlightCurrentPlayer();
 
             BuildBoard();
             DrawBoard(gameState.Board);
@@ -368,9 +370,10 @@ namespace Chessed
             }
 
             gameState.MakeMove(move);
+            lastMove = move;
             DrawBoard(gameState.Board);
-
-            //Toast.MakeText(this, GenerateMovePgn(move, !isEmptySquare || move.Type == MoveType.EnPassant), ToastLength.Short).Show();
+            HighlightLastMove();
+            HighlightCurrentPlayer();
 
             string moveStr = GenerateMovePgn(move, !isEmptySquare || move.Type == MoveType.EnPassant);
             if (gameState.CurrentPlayer == Player.Black)
@@ -491,6 +494,49 @@ namespace Chessed
             {
                 ((ImageButton)((FrameLayout)chessBoard.GetChildAt(to.Row * 8 + to.Column)).GetChildAt(0)).SetBackgroundColor(Resources.GetColor(((to.Row + to.Column) % 2 == 1) ? Resource.Color.board_dark : Resource.Color.board_light, Theme));
             }
+
+            HighlightLastMove();
+        }
+
+        private void HighlightCurrentPlayer()
+        {
+            if (gameState.CurrentPlayer == player)
+            {
+                FindViewById<RelativeLayout>(Resource.Id.playerCard).SetBackgroundColor(Resources.GetColor(Resource.Color.green, Theme));
+                FindViewById<RelativeLayout>(Resource.Id.opponentCard).SetBackgroundColor(Resources.GetColor(Resource.Color.bg_dark, Theme));
+            }
+            else
+            {
+                FindViewById<RelativeLayout>(Resource.Id.playerCard).SetBackgroundColor(Resources.GetColor(Resource.Color.bg_dark, Theme));
+                FindViewById<RelativeLayout>(Resource.Id.opponentCard).SetBackgroundColor(Resources.GetColor(Resource.Color.green, Theme));
+            }
+        }
+
+        private void HighlightLastMove()
+        {
+            // Reset board colors
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    ((ImageButton)((FrameLayout)chessBoard.GetChildAt(i * 8 + j)).GetChildAt(0)).SetBackgroundColor(Resources.GetColor(((i + j) % 2 == 1) ? Resource.Color.board_dark : Resource.Color.board_light, Theme));
+                }
+            }
+
+            if (lastMove == null) return;
+
+            ((ImageButton)((FrameLayout)chessBoard.GetChildAt(lastMove.FromPos.Row * 8 + lastMove.FromPos.Column)).GetChildAt(0)).SetBackgroundColor(Resources.GetColor(((lastMove.FromPos.Row + lastMove.FromPos.Column) % 2 == 1) ? Resource.Color.board_dark_moved : Resource.Color.board_light_moved, Theme));
+            ((ImageButton)((FrameLayout)chessBoard.GetChildAt(lastMove.ToPos.Row * 8 + lastMove.ToPos.Column)).GetChildAt(0)).SetBackgroundColor(Resources.GetColor(((lastMove.ToPos.Row + lastMove.ToPos.Column) % 2 == 1) ? Resource.Color.board_dark_moved : Resource.Color.board_light_moved, Theme));
+
+            Player checkedPlayer = Player.None;
+
+            if (gameState.Board.IsInCheck(gameState.CurrentPlayer)) checkedPlayer = gameState.CurrentPlayer;
+            if (gameState.Board.IsInCheck(gameState.CurrentPlayer.Opponent())) checkedPlayer = gameState.CurrentPlayer.Opponent();
+
+            if (checkedPlayer == Player.None) return;
+
+            Position kingPos = gameState.Board.FindPiece(checkedPlayer, PieceType.King);
+            ((ImageButton)((FrameLayout)chessBoard.GetChildAt(kingPos.Row * 8 + kingPos.Column)).GetChildAt(0)).SetBackgroundColor(Resources.GetColor(Resource.Color.danger, Theme));
         }
 
         void BuildBoard()

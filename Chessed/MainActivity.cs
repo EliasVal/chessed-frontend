@@ -13,7 +13,6 @@ using Android.Content.PM;
 using Firebase;
 using Firebase.Auth;
 using Android.Gms.Extensions;
-using Android.Runtime;
 
 namespace Chessed
 {
@@ -28,7 +27,11 @@ namespace Chessed
 
         CustomHttpClient client = new CustomHttpClient()
         {
-            BaseAddress = new Uri("http://192.168.1.238:3000")
+#if DEBUG
+            BaseAddress = new Uri("http://192.168.1.238:8080")
+#else
+            BaseAddress = new Uri("http://chessed-ac171.oa.r.appspot.com")
+#endif
         };
 
         /// <summary>

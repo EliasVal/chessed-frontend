@@ -1,21 +1,15 @@
 ﻿using Android.App;
-using Android.Content;
 using Android.Content.Res;
-using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using AndroidX.ConstraintLayout.Widget;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Chessed
 {
@@ -75,6 +69,11 @@ namespace Chessed
                 lbButtonsContainer.AddView(btn);
                 lbButtons.Add(button, btn);
             }
+
+            selected = leaderboards[0];
+            ThreadStart ts = new ThreadStart(FetchLb);
+            th = new Thread(ts);
+            th.Start();
         }
 
         public void LbButton_Click(object sender, EventArgs v)
@@ -101,19 +100,20 @@ namespace Chessed
             ThreadStart ts = new ThreadStart(FetchLb);
             th = new Thread(ts);
             th.Start();
-            
-            
-
         }
 
         async void FetchLb()
         {
             string t = selected;
+            RunOnUiThread(() => {
+                lbPlayersContainer.RemoveAllViews();
+                this.ShowLoadingSpinner(lbPlayersContainer);
+            });
+
+
             string res = await client.GetStringAsync($"https://lichess.org/api/player/top/50/{t}");
 
             JsonArray obj = JsonSerializer.Deserialize<JsonObject>(res)["users"].AsArray();
-
-            RunOnUiThread(() => lbPlayersContainer.RemoveAllViews());
 
             int count = 1;
             foreach (JsonNode user in obj)
@@ -143,6 +143,7 @@ namespace Chessed
                     lbPlayersContainer.AddView(card);
                 });
             }
+            RunOnUiThread(() => this.HideLoadingSpinner());
         }
     }
 }

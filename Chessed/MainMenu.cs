@@ -1,7 +1,6 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.Hardware.Lights;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
@@ -9,20 +8,11 @@ using Android.Widget;
 using Firebase;
 using Firebase.Auth;
 using Java.Interop;
-using Java.Sql;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Printing;
 using System.Linq;
-using System.Net.Http;
-using System.Net.WebSockets;
-using System.Text;
-using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Threading;
-using System.Threading.Tasks;
 using Xamarin.Essentials;
-using static Android.Icu.Text.ListFormatter;
 
 namespace Chessed
 {
@@ -33,7 +23,11 @@ namespace Chessed
 
         CustomHttpClient client = new CustomHttpClient()
         {
-            BaseAddress = new Uri("http://192.168.1.238:3000")
+#if DEBUG
+            BaseAddress = new Uri("http://192.168.1.238:8080")
+#else
+            BaseAddress = new Uri("http://chessed-ac171.oa.r.appspot.com")
+#endif
         };
 
         TextView ELOTv, UsernameTv, WinsTv, DrawsTv, LossesTv;
@@ -138,7 +132,16 @@ namespace Chessed
                 return;
             }
 
-            JsonObject matches = userData["matches"].AsObject();
+            JsonObject _matches = userData["matches"].AsObject();
+
+            Dictionary<string, ulong> matches = new Dictionary<string, ulong>();
+
+            foreach (var match in _matches)
+            {
+                matches.Add(match.Key, ulong.Parse(match.Value["time"].ToString()));
+            }
+
+            var sortedMatches = from entry in matches orderby entry.Value ascending select entry;
 
             RunOnUiThread(() =>
             {
@@ -146,7 +149,7 @@ namespace Chessed
                 matchesContent.RemoveAllViews();
             });
 
-            foreach (var match in matches)
+            foreach (var match in sortedMatches)
             {
                 try
                 {
@@ -178,7 +181,7 @@ namespace Chessed
                         resultText = "Drawn";
                         resultColor = Resource.Color.warning;
                     }
-                    else if (res["winner"].ToString() == "w" && whiteName != null || res["winner"].ToString() == "b" && blackName != null)
+                    else if (res["winner"].ToString() == "w" && res["playedAs"].ToString() == "white" || res["winner"].ToString() == "b" && res["playedAs"].ToString() == "black")
                     {
                         resultText = "Won";
                         resultColor = Resource.Color.success;

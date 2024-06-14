@@ -188,7 +188,7 @@ namespace Chessed
             return wBishopPos.SquareColor() == bBishopPos.SquareColor();
         }
 
-        private Position FindPiece(Player color, PieceType type)
+        public Position FindPiece(Player color, PieceType type)
         {
             return PiecePositionsFor(color).First(pos => this[pos].Type == type);
         }
