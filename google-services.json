@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "627390308707",
+    "firebase_url": "https://chessed-ac171-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "chessed-ac171",
+    "storage_bucket": "chessed-ac171.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:627390308707:android:ae94ac549f514172e93356",
+        "android_client_info": {
+          "package_name": "com.eliasvalk.chessed"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "627390308707-vnd8i3m8grm47outiu2ithmtv683mh4m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.eliasvalk.chessed",
+            "certificate_hash": "80c1424e02462ac9e3a2edd4c9dcf7210ad421b6"
+          }
+        },
+        {
+          "client_id": "627390308707-0c7h6ntsstibdjlvloh8o6mids7qvp05.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXHPqGSSl7P7u3547LDr40yig_o7mk9y8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "627390308707-0c7h6ntsstibdjlvloh8o6mids7qvp05.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
